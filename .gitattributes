@@ -1,1 +1,4 @@
 * text=auto eol=lf
+# Preserve the bundled skill sources and assets byte-for-byte across platforms.
+skills/** -text
+variants/** -text
