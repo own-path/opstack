@@ -6,7 +6,7 @@ jobs:
   verify:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-22.04, windows-2022]
         python: ['3.9', '3.13']
     runs-on: ${{ matrix.os }}
     steps:
