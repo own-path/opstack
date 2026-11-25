@@ -91,11 +91,29 @@ def library_skills(base, agent):
     return result
 
 
+def domain_skill_available(target, name):
+    folder = target / name
+    entry = folder / 'SKILL.md'
+    if folder.is_symlink() or entry.is_symlink() or not entry.is_file():
+        return False
+    text = entry.read_text(encoding='utf-8')
+    header = re.match(r'\A---\r?\n(.*?)\r?\n---(?:\r?\n|\Z)', text, re.S)
+    if not header:
+        return False
+    field = re.search(r'^name:\s*([^\r\n]+)', header[1], re.M)
+    if not field or field[1].strip().strip('"\'').lower() != name:
+        return False
+    return re.search(r'^description:[ \t]*\S', header[1], re.M) is not None
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--agent', choices=TARGETS, default='copilot')
     parser.add_argument('--target', type=Path, help='Override the personal skill destination')
     parser.add_argument('--library', type=Path, help='Also import a local exported personal skill library')
+    parser.add_argument('--only', nargs='+', metavar='SKILL', help='Install selected names only, preserving other installed skills')
+    parser.add_argument('--check-library', action='store_true', help='Check whether all 146 domain skills are installed; no writes')
+    parser.add_argument('--require-library', action='store_true', help='Refuse setup unless all 146 domain skills will be available')
     parser.add_argument('--dry-run', action='store_true')
     parser.add_argument('--verify', action='store_true', help='Check collection only; do not install')
     args = parser.parse_args(argv)
@@ -114,6 +132,25 @@ def main(argv=None):
         if library == resolved or library in resolved.parents:
             raise ValueError('Installation target must be outside the imported library.')
         selected += library_skills(library, args.agent)
+    catalog = json.loads((ROOT / 'skills/opstack-swarm/references/library-catalog.json').read_text())
+    required = {row['installed_name'] for row in catalog['skills']}
+    if args.only:
+        unknown = set(args.only) - {name for _, name in selected}
+        if unknown:
+            raise ValueError('Unknown selected skills: ' + ', '.join(sorted(unknown)))
+        selected = [(source, name) for source, name in selected if name in args.only]
+    available = {name for name in required if domain_skill_available(target, name)}
+    if args.check_library:
+        missing = required - available
+        print('Domain library: {}/{} installed.'.format(len(available), len(required)))
+        if missing:
+            print('Missing: ' + ', '.join(sorted(missing)))
+            return 1
+        return 0
+    if args.require_library:
+        missing = required - available - {name for _, name in selected}
+        if missing:
+            raise ValueError('Full-stack setup needs the personal archive via --library PATH. Missing domain skills: ' + ', '.join(sorted(missing)))
     if len({name for _, name in selected}) != len(selected):
         raise ValueError('Duplicate skill names in selected sources.')
     pending, conflicts, expected_maps = [], [], {}

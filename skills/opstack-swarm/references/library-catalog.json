@@ -1,0 +1,735 @@
+{
+  "count": 146,
+  "skills": [
+    {
+      "name": "emil-design-eng",
+      "installed_name": "emil-design-eng",
+      "group": "01-ui-design-implementation-reviews"
+    },
+    {
+      "name": "apple-design",
+      "installed_name": "apple-design",
+      "group": "01-ui-design-implementation-reviews"
+    },
+    {
+      "name": "break-ui",
+      "installed_name": "break-ui",
+      "group": "01-ui-design-implementation-reviews"
+    },
+    {
+      "name": "prototype",
+      "installed_name": "prototype",
+      "group": "01-ui-design-implementation-reviews"
+    },
+    {
+      "name": "pick-ui-library",
+      "installed_name": "pick-ui-library",
+      "group": "01-ui-design-implementation-reviews"
+    },
+    {
+      "name": "mobile-native",
+      "installed_name": "mobile-native",
+      "group": "01-ui-design-implementation-reviews"
+    },
+    {
+      "name": "gestures",
+      "installed_name": "gestures",
+      "group": "01-ui-design-implementation-reviews"
+    },
+    {
+      "name": "animate",
+      "installed_name": "animate",
+      "group": "01-ui-design-implementation-reviews"
+    },
+    {
+      "name": "animate-expo",
+      "installed_name": "animate-expo",
+      "group": "01-ui-design-implementation-reviews"
+    },
+    {
+      "name": "animation-performance",
+      "installed_name": "animation-performance",
+      "group": "01-ui-design-implementation-reviews"
+    },
+    {
+      "name": "animation-vocabulary",
+      "installed_name": "animation-vocabulary",
+      "group": "01-ui-design-implementation-reviews"
+    },
+    {
+      "name": "choreograph",
+      "installed_name": "choreograph",
+      "group": "01-ui-design-implementation-reviews"
+    },
+    {
+      "name": "review-animations",
+      "installed_name": "review-animations",
+      "group": "01-ui-design-implementation-reviews"
+    },
+    {
+      "name": "improve-animations",
+      "installed_name": "improve-animations",
+      "group": "01-ui-design-implementation-reviews"
+    },
+    {
+      "name": "remove-animations",
+      "installed_name": "remove-animations",
+      "group": "01-ui-design-implementation-reviews"
+    },
+    {
+      "name": "find-animation-opportunities",
+      "installed_name": "find-animation-opportunities",
+      "group": "01-ui-design-implementation-reviews"
+    },
+    {
+      "name": "ask-emil",
+      "installed_name": "ask-emil",
+      "group": "01-ui-design-implementation-reviews"
+    },
+    {
+      "name": "ask-sonner",
+      "installed_name": "ask-sonner",
+      "group": "01-ui-design-implementation-reviews"
+    },
+    {
+      "name": "learn-taste",
+      "installed_name": "learn-taste",
+      "group": "01-ui-design-implementation-reviews"
+    },
+    {
+      "name": "sites",
+      "installed_name": "sites",
+      "group": "01-ui-design-implementation-reviews"
+    },
+    {
+      "name": "sites-remix",
+      "installed_name": "sites-remix",
+      "group": "01-ui-design-implementation-reviews"
+    },
+    {
+      "name": "review-agent",
+      "installed_name": "review-agent",
+      "group": "02-code-review-development-discovery-tooling"
+    },
+    {
+      "name": "write-swift",
+      "installed_name": "write-swift",
+      "group": "02-code-review-development-discovery-tooling"
+    },
+    {
+      "name": "solana-dev",
+      "installed_name": "solana-dev",
+      "group": "02-code-review-development-discovery-tooling"
+    },
+    {
+      "name": "eval-engineering",
+      "installed_name": "eval-engineering",
+      "group": "02-code-review-development-discovery-tooling"
+    },
+    {
+      "name": "swarm",
+      "installed_name": "swarm",
+      "group": "02-code-review-development-discovery-tooling"
+    },
+    {
+      "name": "find-skills",
+      "installed_name": "find-skills",
+      "group": "02-code-review-development-discovery-tooling"
+    },
+    {
+      "name": "skill-creator",
+      "installed_name": "skill-creator",
+      "group": "02-code-review-development-discovery-tooling"
+    },
+    {
+      "name": "skill-installer",
+      "installed_name": "skill-installer",
+      "group": "02-code-review-development-discovery-tooling"
+    },
+    {
+      "name": "openai-docs",
+      "installed_name": "openai-docs",
+      "group": "02-code-review-development-discovery-tooling"
+    },
+    {
+      "name": "hf-cli",
+      "installed_name": "hf-cli",
+      "group": "02-code-review-development-discovery-tooling"
+    },
+    {
+      "name": "monid",
+      "installed_name": "monid",
+      "group": "02-code-review-development-discovery-tooling"
+    },
+    {
+      "name": "cap",
+      "installed_name": "cap",
+      "group": "02-code-review-development-discovery-tooling"
+    },
+    {
+      "name": "create-statusline",
+      "installed_name": "create-statusline",
+      "group": "02-code-review-development-discovery-tooling"
+    },
+    {
+      "name": "ecosystem-primer",
+      "installed_name": "ecosystem-primer",
+      "group": "03-ai-app-development"
+    },
+    {
+      "name": "langchain-dependencies",
+      "installed_name": "langchain-dependencies",
+      "group": "03-ai-app-development"
+    },
+    {
+      "name": "langchain-fundamentals",
+      "installed_name": "langchain-fundamentals",
+      "group": "03-ai-app-development"
+    },
+    {
+      "name": "langchain-middleware",
+      "installed_name": "langchain-middleware",
+      "group": "03-ai-app-development"
+    },
+    {
+      "name": "langchain-rag",
+      "installed_name": "langchain-rag",
+      "group": "03-ai-app-development"
+    },
+    {
+      "name": "langchain-python-quickstart",
+      "installed_name": "langchain-python-quickstart",
+      "group": "03-ai-app-development"
+    },
+    {
+      "name": "langchain-typescript-quickstart",
+      "installed_name": "langchain-typescript-quickstart",
+      "group": "03-ai-app-development"
+    },
+    {
+      "name": "langgraph-cli",
+      "installed_name": "langgraph-cli",
+      "group": "03-ai-app-development"
+    },
+    {
+      "name": "langgraph-fundamentals",
+      "installed_name": "langgraph-fundamentals",
+      "group": "03-ai-app-development"
+    },
+    {
+      "name": "langgraph-human-in-the-loop",
+      "installed_name": "langgraph-human-in-the-loop",
+      "group": "03-ai-app-development"
+    },
+    {
+      "name": "langgraph-persistence",
+      "installed_name": "langgraph-persistence",
+      "group": "03-ai-app-development"
+    },
+    {
+      "name": "langgraph-python-quickstart",
+      "installed_name": "langgraph-python-quickstart",
+      "group": "03-ai-app-development"
+    },
+    {
+      "name": "langgraph-typescript-quickstart",
+      "installed_name": "langgraph-typescript-quickstart",
+      "group": "03-ai-app-development"
+    },
+    {
+      "name": "deep-agents-core",
+      "installed_name": "deep-agents-core",
+      "group": "03-ai-app-development"
+    },
+    {
+      "name": "deep-agents-memory",
+      "installed_name": "deep-agents-memory",
+      "group": "03-ai-app-development"
+    },
+    {
+      "name": "deep-agents-orchestration",
+      "installed_name": "deep-agents-orchestration",
+      "group": "03-ai-app-development"
+    },
+    {
+      "name": "deepagents-python-quickstart",
+      "installed_name": "deepagents-python-quickstart",
+      "group": "03-ai-app-development"
+    },
+    {
+      "name": "deepagents-typescript-quickstart",
+      "installed_name": "deepagents-typescript-quickstart",
+      "group": "03-ai-app-development"
+    },
+    {
+      "name": "managed-deep-agents",
+      "installed_name": "managed-deep-agents",
+      "group": "03-ai-app-development"
+    },
+    {
+      "name": "langsmith-dataset",
+      "installed_name": "langsmith-dataset",
+      "group": "03-ai-app-development"
+    },
+    {
+      "name": "langsmith-evaluator",
+      "installed_name": "langsmith-evaluator",
+      "group": "03-ai-app-development"
+    },
+    {
+      "name": "langsmith-trace",
+      "installed_name": "langsmith-trace",
+      "group": "03-ai-app-development"
+    },
+    {
+      "name": "databricks-ai-functions",
+      "installed_name": "databricks-ai-functions",
+      "group": "04-databricks-development-data-operations"
+    },
+    {
+      "name": "databricks-ai-runtime",
+      "installed_name": "databricks-ai-runtime",
+      "group": "04-databricks-development-data-operations"
+    },
+    {
+      "name": "databricks-aibi-dashboards",
+      "installed_name": "databricks-aibi-dashboards",
+      "group": "04-databricks-development-data-operations"
+    },
+    {
+      "name": "databricks-app-design",
+      "installed_name": "databricks-app-design",
+      "group": "04-databricks-development-data-operations"
+    },
+    {
+      "name": "databricks-apps",
+      "installed_name": "databricks-apps",
+      "group": "04-databricks-development-data-operations"
+    },
+    {
+      "name": "databricks-apps-python",
+      "installed_name": "databricks-apps-python",
+      "group": "04-databricks-development-data-operations"
+    },
+    {
+      "name": "databricks-core",
+      "installed_name": "databricks-core",
+      "group": "04-databricks-development-data-operations"
+    },
+    {
+      "name": "databricks-dabs",
+      "installed_name": "databricks-dabs",
+      "group": "04-databricks-development-data-operations"
+    },
+    {
+      "name": "databricks-data-discovery",
+      "installed_name": "databricks-data-discovery",
+      "group": "04-databricks-development-data-operations"
+    },
+    {
+      "name": "databricks-dbsql",
+      "installed_name": "databricks-dbsql",
+      "group": "04-databricks-development-data-operations"
+    },
+    {
+      "name": "databricks-docs",
+      "installed_name": "databricks-docs",
+      "group": "04-databricks-development-data-operations"
+    },
+    {
+      "name": "databricks-execution-compute",
+      "installed_name": "databricks-execution-compute",
+      "group": "04-databricks-development-data-operations"
+    },
+    {
+      "name": "databricks-genie-agents",
+      "installed_name": "databricks-genie-agents",
+      "group": "04-databricks-development-data-operations"
+    },
+    {
+      "name": "databricks-iceberg",
+      "installed_name": "databricks-iceberg",
+      "group": "04-databricks-development-data-operations"
+    },
+    {
+      "name": "databricks-jobs",
+      "installed_name": "databricks-jobs",
+      "group": "04-databricks-development-data-operations"
+    },
+    {
+      "name": "databricks-lakebase",
+      "installed_name": "databricks-lakebase",
+      "group": "04-databricks-development-data-operations"
+    },
+    {
+      "name": "databricks-lakeflow-connect",
+      "installed_name": "databricks-lakeflow-connect",
+      "group": "04-databricks-development-data-operations"
+    },
+    {
+      "name": "databricks-lakeflow-connect-saas",
+      "installed_name": "databricks-lakeflow-connect-saas",
+      "group": "04-databricks-development-data-operations"
+    },
+    {
+      "name": "databricks-lakehouse-mcp",
+      "installed_name": "databricks-lakehouse-mcp",
+      "group": "04-databricks-development-data-operations"
+    },
+    {
+      "name": "databricks-metric-views",
+      "installed_name": "databricks-metric-views",
+      "group": "04-databricks-development-data-operations"
+    },
+    {
+      "name": "databricks-ml-training",
+      "installed_name": "databricks-ml-training",
+      "group": "04-databricks-development-data-operations"
+    },
+    {
+      "name": "databricks-mlflow-evaluation",
+      "installed_name": "databricks-mlflow-evaluation",
+      "group": "04-databricks-development-data-operations"
+    },
+    {
+      "name": "databricks-mlflow-tracing",
+      "installed_name": "databricks-mlflow-tracing",
+      "group": "04-databricks-development-data-operations"
+    },
+    {
+      "name": "databricks-model-serving",
+      "installed_name": "databricks-model-serving",
+      "group": "04-databricks-development-data-operations"
+    },
+    {
+      "name": "databricks-pipelines",
+      "installed_name": "databricks-pipelines",
+      "group": "04-databricks-development-data-operations"
+    },
+    {
+      "name": "databricks-python-sdk",
+      "installed_name": "databricks-python-sdk",
+      "group": "04-databricks-development-data-operations"
+    },
+    {
+      "name": "databricks-sandbox",
+      "installed_name": "databricks-sandbox",
+      "group": "04-databricks-development-data-operations"
+    },
+    {
+      "name": "databricks-serverless",
+      "installed_name": "databricks-serverless",
+      "group": "04-databricks-development-data-operations"
+    },
+    {
+      "name": "databricks-serverless-migration",
+      "installed_name": "databricks-serverless-migration",
+      "group": "04-databricks-development-data-operations"
+    },
+    {
+      "name": "databricks-serverless-migration-api",
+      "installed_name": "databricks-serverless-migration-api",
+      "group": "04-databricks-development-data-operations"
+    },
+    {
+      "name": "databricks-setup-local",
+      "installed_name": "databricks-setup-local",
+      "group": "04-databricks-development-data-operations"
+    },
+    {
+      "name": "databricks-spark-structured-streaming",
+      "installed_name": "databricks-spark-structured-streaming",
+      "group": "04-databricks-development-data-operations"
+    },
+    {
+      "name": "databricks-synthetic-data-gen",
+      "installed_name": "databricks-synthetic-data-gen",
+      "group": "04-databricks-development-data-operations"
+    },
+    {
+      "name": "databricks-unity-catalog",
+      "installed_name": "databricks-unity-catalog",
+      "group": "04-databricks-development-data-operations"
+    },
+    {
+      "name": "databricks-unity-gateway",
+      "installed_name": "databricks-unity-gateway",
+      "group": "04-databricks-development-data-operations"
+    },
+    {
+      "name": "databricks-unstructured-pdf-generation",
+      "installed_name": "databricks-unstructured-pdf-generation",
+      "group": "04-databricks-development-data-operations"
+    },
+    {
+      "name": "databricks-vector-search",
+      "installed_name": "databricks-vector-search",
+      "group": "04-databricks-development-data-operations"
+    },
+    {
+      "name": "databricks-zerobus-ingest",
+      "installed_name": "databricks-zerobus-ingest",
+      "group": "04-databricks-development-data-operations"
+    },
+    {
+      "name": "ai-image-generation",
+      "installed_name": "ai-image-generation",
+      "group": "05-visual-assets-programmatic-animation"
+    },
+    {
+      "name": "imagegen",
+      "installed_name": "imagegen",
+      "group": "05-visual-assets-programmatic-animation"
+    },
+    {
+      "name": "canvas-design",
+      "installed_name": "canvas-design",
+      "group": "05-visual-assets-programmatic-animation"
+    },
+    {
+      "name": "manim-composer",
+      "installed_name": "manim-composer",
+      "group": "05-visual-assets-programmatic-animation"
+    },
+    {
+      "name": "manimce-best-practices",
+      "installed_name": "manimce-best-practices",
+      "group": "05-visual-assets-programmatic-animation"
+    },
+    {
+      "name": "manimgl-best-practices",
+      "installed_name": "manimgl-best-practices",
+      "group": "05-visual-assets-programmatic-animation"
+    },
+    {
+      "name": "present-like-a-pro-skill",
+      "installed_name": "present-like-a-pro-skill",
+      "group": "05-visual-assets-programmatic-animation"
+    },
+    {
+      "name": "visualize",
+      "installed_name": "visualize",
+      "group": "05-visual-assets-programmatic-animation"
+    },
+    {
+      "name": "documents",
+      "installed_name": "documents",
+      "group": "06-documents-workspace-tools"
+    },
+    {
+      "name": "docs",
+      "installed_name": "docs",
+      "group": "06-documents-workspace-tools"
+    },
+    {
+      "name": "docx",
+      "installed_name": "docx",
+      "group": "06-documents-workspace-tools"
+    },
+    {
+      "name": "pdf",
+      "installed_name": "pdf",
+      "group": "06-documents-workspace-tools"
+    },
+    {
+      "name": "Presentations",
+      "installed_name": "presentations",
+      "group": "06-documents-workspace-tools"
+    },
+    {
+      "name": "pptx",
+      "installed_name": "pptx",
+      "group": "06-documents-workspace-tools"
+    },
+    {
+      "name": "Spreadsheets",
+      "installed_name": "spreadsheets",
+      "group": "06-documents-workspace-tools"
+    },
+    {
+      "name": "xlsx",
+      "installed_name": "xlsx",
+      "group": "06-documents-workspace-tools"
+    },
+    {
+      "name": "excel-live-control",
+      "installed_name": "excel-live-control",
+      "group": "06-documents-workspace-tools"
+    },
+    {
+      "name": "google-docs",
+      "installed_name": "google-docs",
+      "group": "06-documents-workspace-tools"
+    },
+    {
+      "name": "google-drive",
+      "installed_name": "google-drive",
+      "group": "06-documents-workspace-tools"
+    },
+    {
+      "name": "google-drive-comments",
+      "installed_name": "google-drive-comments",
+      "group": "06-documents-workspace-tools"
+    },
+    {
+      "name": "google-sheets",
+      "installed_name": "google-sheets",
+      "group": "06-documents-workspace-tools"
+    },
+    {
+      "name": "google-slides",
+      "installed_name": "google-slides",
+      "group": "06-documents-workspace-tools"
+    },
+    {
+      "name": "google-workspace",
+      "installed_name": "google-workspace",
+      "group": "06-documents-workspace-tools"
+    },
+    {
+      "name": "write-page",
+      "installed_name": "write-page",
+      "group": "06-documents-workspace-tools"
+    },
+    {
+      "name": "maintain-space",
+      "installed_name": "maintain-space",
+      "group": "06-documents-workspace-tools"
+    },
+    {
+      "name": "organize-space",
+      "installed_name": "organize-space",
+      "group": "06-documents-workspace-tools"
+    },
+    {
+      "name": "manage-schedules",
+      "installed_name": "manage-schedules",
+      "group": "06-documents-workspace-tools"
+    },
+    {
+      "name": "template-creator",
+      "installed_name": "template-creator",
+      "group": "06-documents-workspace-tools"
+    },
+    {
+      "name": "deep-research",
+      "installed_name": "deep-research",
+      "group": "06-documents-workspace-tools"
+    },
+    {
+      "name": "import-memory",
+      "installed_name": "import-memory",
+      "group": "06-documents-workspace-tools"
+    },
+    {
+      "name": "morning",
+      "installed_name": "morning",
+      "group": "06-documents-workspace-tools"
+    },
+    {
+      "name": "plugin-management",
+      "installed_name": "plugin-management",
+      "group": "06-documents-workspace-tools"
+    },
+    {
+      "name": "artifact-template-analytics-dashboard",
+      "installed_name": "artifact-template-analytics-dashboard",
+      "group": "07-artifact-templates"
+    },
+    {
+      "name": "artifact-template-business-review",
+      "installed_name": "artifact-template-business-review",
+      "group": "07-artifact-templates"
+    },
+    {
+      "name": "artifact-template-design-report",
+      "installed_name": "artifact-template-design-report",
+      "group": "07-artifact-templates"
+    },
+    {
+      "name": "artifact-template-experiment-analysis",
+      "installed_name": "artifact-template-experiment-analysis",
+      "group": "07-artifact-templates"
+    },
+    {
+      "name": "artifact-template-financial-budget",
+      "installed_name": "artifact-template-financial-budget",
+      "group": "07-artifact-templates"
+    },
+    {
+      "name": "artifact-template-investment-committee-memo",
+      "installed_name": "artifact-template-investment-committee-memo",
+      "group": "07-artifact-templates"
+    },
+    {
+      "name": "artifact-template-legal-memorandum",
+      "installed_name": "artifact-template-legal-memorandum",
+      "group": "07-artifact-templates"
+    },
+    {
+      "name": "artifact-template-market-trends-report",
+      "installed_name": "artifact-template-market-trends-report",
+      "group": "07-artifact-templates"
+    },
+    {
+      "name": "artifact-template-minimal-letterhead",
+      "installed_name": "artifact-template-minimal-letterhead",
+      "group": "07-artifact-templates"
+    },
+    {
+      "name": "artifact-template-operating-calendar",
+      "installed_name": "artifact-template-operating-calendar",
+      "group": "07-artifact-templates"
+    },
+    {
+      "name": "artifact-template-operating-review",
+      "installed_name": "artifact-template-operating-review",
+      "group": "07-artifact-templates"
+    },
+    {
+      "name": "artifact-template-project-kickoff",
+      "installed_name": "artifact-template-project-kickoff",
+      "group": "07-artifact-templates"
+    },
+    {
+      "name": "artifact-template-project-tracker",
+      "installed_name": "artifact-template-project-tracker",
+      "group": "07-artifact-templates"
+    },
+    {
+      "name": "artifact-template-sales-pipeline",
+      "installed_name": "artifact-template-sales-pipeline",
+      "group": "07-artifact-templates"
+    },
+    {
+      "name": "artifact-template-simple-dark-mode",
+      "installed_name": "artifact-template-simple-dark-mode",
+      "group": "07-artifact-templates"
+    },
+    {
+      "name": "artifact-template-simple-light-mode",
+      "installed_name": "artifact-template-simple-light-mode",
+      "group": "07-artifact-templates"
+    },
+    {
+      "name": "artifact-template-strategy-memorandum",
+      "installed_name": "artifact-template-strategy-memorandum",
+      "group": "07-artifact-templates"
+    },
+    {
+      "name": "artifact-template-system-design",
+      "installed_name": "artifact-template-system-design",
+      "group": "07-artifact-templates"
+    },
+    {
+      "name": "artifact-template-team-alignment",
+      "installed_name": "artifact-template-team-alignment",
+      "group": "07-artifact-templates"
+    },
+    {
+      "name": "artifact-template-three-statement-forecast",
+      "installed_name": "artifact-template-three-statement-forecast",
+      "group": "07-artifact-templates"
+    }
+  ]
+}

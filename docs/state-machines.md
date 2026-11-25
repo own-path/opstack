@@ -1,6 +1,6 @@
 # Installer state and invariants
 
-The installer has a single synchronous lifecycle. It does not configure accounts, models, external dependencies, or personal instructions.
+The installer has a single synchronous lifecycle. `--only` narrows the selected install set before conflict checks; unknown names fail before writes. `--check-library` checks all 146 domain entrypoints for basic name/description frontmatter and rejects symlinked entrypoints without copying; it does not prove service-tool availability. `--require-library` refuses a setup missing any required domain skill before creating the target. It does not configure accounts, models, external dependencies, or personal instructions.
 
 | State | Transition | Guard / observable outcome |
 | --- | --- | --- |
@@ -27,3 +27,7 @@ The installer has a single synchronous lifecycle. It does not configure accounts
 - A matching repeat install verifies the payload without rewriting existing skill files. Upgrades with changed same-name skills require manual reconciliation; there is no silent force mode.
 
 The installer owns no background process, retry loop, database, watchdog, or persistent job state. Tests cover the transitions involving dry runs, conflicts, repeat installs, locks, selected variants, and invalid sources. Native client discovery and instruction inclusion are separate lifecycle steps verified in the client.
+
+## Swarm tasks
+
+The native multi-agent protocol is defined in [the swarm lifecycle](../skills/opstack-swarm/references/lifecycle.md). Worker returned is distinct from parent verified; only verified results unblock dependents. Write ownership, attempt identity, cancellation, explicit model selection, and stale output are checked by the parent agent against actual native handles. This is an agent protocol, not a background service installed by the Python copier.

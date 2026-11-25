@@ -5,7 +5,7 @@ description: "Explain opstack, select the right workflow for a concrete task, an
 
 # Help use opstack
 
-Find the user's immediate task and recommend one starting skill. Use opstack-mode for a non-trivial implementation, opstack-discover for understanding, opstack-debug for a bug, opstack-review for read-only defect review, opstack-state-review for lifecycle behavior, and opstack-ui-review for interface quality. Use opstack-setup for installation or default activation.
+Find the user's immediate task and recommend one starting skill. Use opstack-mode for a non-trivial implementation, opstack-discover for understanding, opstack-debug for a bug, opstack-review for read-only defect review, opstack-state-review for lifecycle behavior, and opstack-ui-review for interface quality. Use opstack-swarm for native parallel work with cheaper Luna/Sonnet workers, and opstack-setup for installation or default activation.
 
 Give a short ready-to-paste example. Bare personal skills use the client's discovered skill name; native plugins can namespace commands (for example, Claude's opstack:opstack-mode). Prefer natural language when the client's slash syntax is unknown. Do not imply an unpublished plugin is listed on a public marketplace.
 

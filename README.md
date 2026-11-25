@@ -4,14 +4,14 @@
 
 Understand the codebase. Shape the change. Build with intent. Review the transitions. Verify the behavior.
 
-opstack turns those habits into 12 focused skills for Copilot, Cursor, Claude Code, and Codex. It includes a default mode, repository discovery, architecture, implementation, debugging, code review, state-machine review, UI review, verification, and learning from corrections. Simple edits stay simple.
+opstack turns those habits into 13 focused skills for Copilot, Cursor, Claude Code, and Codex. It includes a native swarm, a default mode, repository discovery, architecture, implementation, debugging, code review, state-machine review, UI review, verification, and learning from corrections. Simple edits stay simple.
 
 ## Make it your default
 
 Clone this repo, open it in your agent, and paste:
 
 ```text
-Set up opstack from this repository as my default personal coding workflow. Read README.md, detect my client, run the installer dry run, then install its core skills. Add instructions/opstack.instructions.md to this client's supported personal instructions, preserving existing guidance and company/repository rules. Use opstack-mode automatically for non-trivial coding tasks; keep small edits proportionate and reviews read-only. Verify skill discovery and instruction activation in a fresh chat where possible. Report anything you could not activate. Do not change shared work-repo settings or install unrelated dependencies.
+Set up or update opstack as my default personal coding workflow. Read README.md and use the supported setup for this client. Preserve customized skills and existing company/repository rules; use --only opstack-swarm to add swarm without overwriting older skills. Enable native opstack-swarm for useful independent tasks. Keep planning, architecture, integration, and verification on a strong main model such as GPT 6.1 Sol or Claude Opus 5.5; explicitly select cheaper Luna/Sonnet workers from this client's available models, with no silent expensive fallback. Import my exported 146-skill library if needed and run --check-library; report missing skills rather than claiming full setup. Register instructions/opstack.instructions.md at personal scope and verify activation in a fresh chat where possible.
 ```
 
 [Default prompt and fallback](DEFAULT-PROMPT.md) · [Personal instruction template](instructions/opstack.instructions.md)
@@ -60,6 +60,7 @@ The `.codex-plugin/plugin.json` metadata is included for plugin packaging. The P
 ```text
 Use opstack-mode to add cancellation to the background export job.
 Use opstack-discover to explain how authentication reaches the database.
+Use opstack-swarm to review this branch with independent correctness and state-transition lenses.
 Use opstack-review to review this branch against main. Keep it read-only.
 Use opstack-state-review to check retries, timeouts, and stale workers.
 Use opstack-ui-review to check the mobile checkout and its error states.
@@ -67,6 +68,7 @@ Use opstack-ui-review to check the mobile checkout and its error states.
 
 | Skill | Outcome |
 | --- | --- |
+| `opstack-swarm` | Native parallel discovery, independent implementation slices, and review lenses using cheaper workers |
 | `opstack-mode` | Routes the task and owns delivery and verification |
 | `opstack-discover` | Evidence-backed map of the relevant code and checks |
 | `opstack-architect` | Data shapes, boundaries, invariants, and validation plan |
@@ -80,22 +82,41 @@ Use opstack-ui-review to check the mobile checkout and its error states.
 | `opstack-setup` | Client-aware installation and default activation |
 | `opstack-help` | Picks a starting workflow and gives an invocation |
 
-The main agent keeps architecture, integration, and verification. Delegation happens only when explicitly authorized and available. It verifies delegate output instead of trusting a success summary. No model provider or tier is hardcoded.
+The main agent keeps architecture, integration, and verification. The default personal setup enables native swarms for useful independent work: GPT 6.1 Sol / Claude Opus 5.5 main-agent preferences, with explicitly selected cheaper Luna/Sonnet workers. Resolve actual model IDs from the client; never silently inherit an expensive main model for workers. Without suitable native delegation/model selection, work sequentially and report the limit. Worker output is verified by the main agent.
 
 For stateful changes, review the real transition guards under retries, timeouts, concurrency, crash/restart, and sleep/wake. Keep the repository's state-machine document current when relevant. For simple wording or style changes, a proportionate check is enough. Workflows do not add permission to publish, merge, send messages, or change accounts.
 
-## Optional: import your personal skill archive
+## Native swarm
 
-The 12 original workflows have no dependency on a private library or a provider-specific tool. If you have Daryl's previously exported `portable-skills` archive, extract it locally and add it to the same personal skill destination:
+opstack owns the swarm workflow and model-role policy. The client provides the actual subagent execution; no QuickJS/PTC swarm runtime or external orchestrator is required. The strong main agent plans and verifies; up to three Luna/Sonnet workers take independent bounded tasks. Only parent-verified results unblock dependencies. Writers never share ownership of a file concurrently. Retries wait for the previous worker to stop, use a new attempt ID, and reject stale results.
+
+[Workflow](skills/opstack-swarm/SKILL.md) · [Model policy example](skills/opstack-swarm/references/model-policy.example.json) · [Client adapters](skills/opstack-swarm/references/clients.md)
+
+The model-policy JSON records preferences; copying it does not configure a client's models. At setup, the agent resolves the available main/worker model IDs and saves that mapping in personal instructions/settings. If the runtime cannot explicitly select a cheaper worker, it reports the limit and executes sequentially.
+
+### Add swarm to an existing installation
 
 ```sh
-python3 scripts/install.py --agent copilot --library /path/to/portable-skills --dry-run
-python3 scripts/install.py --agent copilot --library /path/to/portable-skills
+git pull
+python3 scripts/install.py --agent copilot --only opstack-swarm --dry-run
+python3 scripts/install.py --agent copilot --only opstack-swarm
 ```
 
-For the previous `daryls-skills` repository export, point `--library` at its `library` folder. The importer checks the archive's manifest and file checksums, preserves scripts/assets/references, and flattens its 146 selected skills next to the 12 opstack skills: **158 installed skills**. Claude uses that archive's alternate `pdf` and `skill-creator` versions. Copilot and Cursor receive lowercase frontmatter names for the two original capitalized skills. Originals remain unchanged.
+Then use the updated default prompt above to refresh your personal instructions and activate swarm. `--only` preserves every older skill, including local edits. A full reinstall still stops if older skills differ: compare those opstack folders, keep a dated backup, and reconcile deliberately before installing the newer copies. Native plugin users update their plugin through the client's plugin manager instead. No force-overwrite option is added.
 
-The personal archive is not published in this public repo. Domain-specific integrations still require their corresponding tools and accounts on the destination. Optional installed UI, AI, Databricks, and document skills can complement opstack; a copied instruction cannot create an unavailable tool.
+## Full stack: your 146 domain skills
+
+The 13 original workflows have no dependency on a private library or a provider-specific tool. If you have Daryl's previously exported `portable-skills` archive, extract it locally and add it to the same personal skill destination:
+
+```sh
+python3 scripts/install.py --agent copilot --library /path/to/portable-skills --require-library --dry-run
+python3 scripts/install.py --agent copilot --library /path/to/portable-skills --require-library
+python3 scripts/install.py --agent copilot --check-library
+```
+
+For the previous `daryls-skills` repository export, point `--library` at its `library` folder. The importer checks the archive's manifest and file checksums, preserves scripts/assets/references, and flattens its 146 selected skills next to the 13 opstack skills: **159 installed skills**. Claude uses that archive's alternate `pdf` and `skill-creator` versions. Copilot and Cursor receive lowercase frontmatter names for the two original capitalized skills. Originals remain unchanged.
+
+The personal archive is not published in this public repo. A clone contains the 13 opstack workflows and a catalog of the 146 skills, not their contents. Full-stack setup must transfer/extract that archive locally and verify availability; it must not claim the 146 were installed from the public repo alone. Domain-specific integrations still require their corresponding tools and accounts on the destination. The swarm assigns the relevant installed UI, coding, AI, Databricks, visual, document, and template skills to each worker; a copied instruction cannot create an unavailable tool.
 
 ## Develop and verify
 

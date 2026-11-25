@@ -36,7 +36,7 @@ class InstallTests(unittest.TestCase):
         for agent in installer.TARGETS:
             self.target = self.base / agent
             self.assertEqual(self.run_install('--agent', agent), 0)
-            self.assertEqual(len(list(self.target.glob('*/SKILL.md'))), 12)
+            self.assertEqual(len(list(self.target.glob('*/SKILL.md'))), 13)
             before = installer.file_map(self.target)
             self.assertEqual(self.run_install('--agent', agent), 0)
             self.assertEqual(installer.file_map(self.target), before)
@@ -81,7 +81,7 @@ class InstallTests(unittest.TestCase):
     def test_library_import_normalizes_copilot_and_selects_claude(self):
         library = self.fixture_library()
         self.assertEqual(self.run_install('--library', str(library)), 0)
-        self.assertEqual(len(list(self.target.glob('*/SKILL.md'))), 14)
+        self.assertEqual(len(list(self.target.glob('*/SKILL.md'))), 15)
         self.assertIn('name: presentations\n', (self.target / 'presentations/SKILL.md').read_text())
         self.target = self.base / 'claude'
         self.assertEqual(self.run_install('--agent', 'claude', '--library', str(library)), 0)
@@ -127,6 +127,57 @@ class InstallTests(unittest.TestCase):
         finally:
             installer.ROOT = original
         self.assertFalse(self.target.exists())
+
+    def test_only_adds_swarm_without_overwriting_old_custom_skills(self):
+        custom = self.target / 'opstack-mode'
+        custom.mkdir(parents=True)
+        (custom / 'SKILL.md').write_text('personal old mode')
+        self.assertEqual(self.run_install('--only', 'opstack-swarm'), 0)
+        self.assertTrue((self.target / 'opstack-swarm/SKILL.md').is_file())
+        self.assertTrue((self.target / 'opstack-swarm/references/library-catalog.json').is_file())
+        self.assertEqual((custom / 'SKILL.md').read_text(), 'personal old mode')
+        self.assertEqual(len(list(self.target.glob('*/SKILL.md'))), 2)
+
+    def test_unknown_selection_refuses_before_writes(self):
+        with self.assertRaisesRegex(ValueError, 'Unknown selected skills'):
+            self.run_install('--only', 'missing-skill')
+        self.assertFalse(self.target.exists())
+
+    def test_missing_full_library_refuses_before_writes(self):
+        with self.assertRaisesRegex(ValueError, 'Full-stack setup needs'):
+            self.run_install('--require-library')
+        self.assertFalse(self.target.exists())
+        self.assertEqual(self.run_install('--check-library'), 1)
+        self.assertFalse(self.target.exists())
+
+    def test_check_library_reports_all_catalog_skills_without_installing_core(self):
+        catalog = json.loads((ROOT / 'skills/opstack-swarm/references/library-catalog.json').read_text())
+        self.assertEqual(len(catalog['skills']), 146)
+        for row in catalog['skills']:
+            p = self.target / row['installed_name'] / 'SKILL.md'
+            p.parent.mkdir(parents=True)
+            p.write_text('---\nname: ' + row['installed_name'] + '\ndescription: fixture\n---\n')
+        before = installer.file_map(self.target)
+        self.assertEqual(self.run_install('--check-library'), 0)
+        self.assertEqual(installer.file_map(self.target), before)
+        self.assertFalse((self.target / 'opstack-mode').exists())
+
+    def test_domain_availability_rejects_empty_or_wrong_entrypoint(self):
+        entry = self.target / 'break-ui/SKILL.md'
+        entry.parent.mkdir(parents=True)
+        entry.write_text('placeholder')
+        self.assertFalse(installer.domain_skill_available(self.target, 'break-ui'))
+        entry.write_text('---\nname: wrong-name\ndescription: fixture\n---\n')
+        self.assertFalse(installer.domain_skill_available(self.target, 'break-ui'))
+
+    @unittest.skipIf(os.name == 'nt', 'Creating symlinks may require Windows privileges')
+    def test_domain_availability_rejects_symlink_entrypoint(self):
+        outside = self.base / 'outside.md'
+        outside.write_text('---\nname: break-ui\ndescription: fixture\n---\n')
+        entry = self.target / 'break-ui/SKILL.md'
+        entry.parent.mkdir(parents=True)
+        entry.symlink_to(outside)
+        self.assertFalse(installer.domain_skill_available(self.target, 'break-ui'))
 
     def test_manifests_and_names(self):
         for client in ['cursor', 'claude', 'codex']:

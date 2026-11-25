@@ -13,6 +13,7 @@ Read applicable repository instructions and inspect the working tree before chan
 
 | Task | Read |
 | --- | --- |
+| Independent discovery, implementation slices, or review lenses | [opstack-swarm](../opstack-swarm/SKILL.md) |
 | Unfamiliar repository or subsystem | [opstack-discover](../opstack-discover/SKILL.md) |
 | Cross-module feature or structural decision | [opstack-architect](../opstack-architect/SKILL.md), then [opstack-build](../opstack-build/SKILL.md) |
 | Reproducible defect | [opstack-debug](../opstack-debug/SKILL.md) |
@@ -26,7 +27,7 @@ A review-only request stays read-only. A discovery request produces evidence, no
 
 ## Keep ownership
 
-Own architecture, planning, integration, and verification. If delegation is explicitly requested or authorized and supported, assign bounded tasks with file ownership and acceptance criteria. Treat every delegate's result as a draft: inspect the diff and run the relevant checks yourself. If delegation is unavailable, do the work sequentially. Do not change models, install model clients, or invent subagent APIs.
+Own architecture, planning, integration, and verification. When the user explicitly requests swarm or enables it in their personal default instructions, use [opstack-swarm](../opstack-swarm/SKILL.md) for useful independent work. Keep a strong main model (such as GPT 6.1 Sol or Claude Opus 5.5) and explicitly select cheaper Luna/Sonnet workers from the actual runtime. Assign bounded tasks with file ownership, relevant domain skills, and acceptance criteria. Treat every delegate's result as a draft: inspect the diff and run the relevant checks yourself. If delegation is unavailable, do the work sequentially. Do not silently change the main model, let workers inherit an expensive model, install extra model clients, or invent subagent APIs.
 
 Before a commit, apply the state review at the scale of the change. Inspect the complete resulting diff for regressions. Use existing installed domain skills when helpful; they are optional, not prerequisites. Project and organization rules govern conflicts with personal preferences.
 

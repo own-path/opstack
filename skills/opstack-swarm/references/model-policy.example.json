@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "main": {
+    "preferred_labels": [
+      "GPT 6.1 Sol",
+      "Claude Opus 5.5"
+    ],
+    "native_model_id": null,
+    "responsibilities": [
+      "planning",
+      "architecture",
+      "integration",
+      "verification"
+    ]
+  },
+  "worker": {
+    "allowed_tiers": [
+      "luna",
+      "sonnet"
+    ],
+    "native_model_id": null,
+    "allow_inherit": false,
+    "allow_expensive_fallback": false
+  },
+  "limits": {
+    "max_workers": 3,
+    "max_attempts_per_task": 2,
+    "nested_workers": false
+  }
+}
