@@ -1,0 +1,16 @@
+{
+  "name": "opstack",
+  "owner": {
+    "name": "Daryl"
+  },
+  "plugins": [
+    {
+      "name": "opstack",
+      "source": "./",
+      "description": "Daryl's portable engineering workflows: understand the repo, build deliberately, review state transitions, and verify behavior."
+    }
+  ],
+  "metadata": {
+    "description": "Daryl\u2019s portable engineering workflows for coding agents."
+  }
+}

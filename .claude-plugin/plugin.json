@@ -1,0 +1,19 @@
+{
+  "name": "opstack",
+  "version": "0.1.0",
+  "description": "Daryl's portable engineering workflows: understand the repo, build deliberately, review state transitions, and verify behavior.",
+  "author": {
+    "name": "Daryl"
+  },
+  "repository": "https://github.com/own-path/opstack",
+  "keywords": [
+    "workflow",
+    "code-review",
+    "ui",
+    "verification",
+    "state-machines"
+  ],
+  "skills": "./skills/",
+  "license": "MIT",
+  "icon": "./assets/icon.png"
+}
