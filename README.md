@@ -11,7 +11,7 @@ opstack turns those habits into 13 focused skills for Copilot, Cursor, Claude Co
 Clone this repo, open it in your agent, and paste:
 
 ```text
-Set up or update opstack as my default personal coding workflow. Read README.md and use the supported setup for this client. Preserve customized skills and existing company/repository rules; use --only opstack-swarm to add swarm without overwriting older skills. Enable native opstack-swarm for useful independent tasks. Keep planning, architecture, integration, and verification on a strong main model such as GPT 6.1 Sol or Claude Opus 5.5; explicitly select cheaper Luna/Sonnet workers from this client's available models, with no silent expensive fallback. Import my exported 146-skill library if needed and run --check-library; report missing skills rather than claiming full setup. Register instructions/opstack.instructions.md at personal scope and verify activation in a fresh chat where possible.
+Set up or update opstack as my default personal coding workflow. Read README.md and use the supported setup for this client. Preserve customized skills and existing company/repository rules; use --only opstack-swarm to add swarm without overwriting older skills. Enable native opstack-swarm for useful independent tasks. Keep planning, architecture, integration, and verification on a strong main model such as GPT 6.1 Sol or Claude Opus 5.5; explicitly select smaller, cheaper workers available in the developer’s environment from this client's available models, with no silent expensive fallback. Import my exported 146-skill library if needed and run --check-library; report missing skills rather than claiming full setup. Register instructions/opstack.instructions.md at personal scope and verify activation in a fresh chat where possible.
 ```
 
 [Default prompt and fallback](DEFAULT-PROMPT.md) · [Personal instruction template](instructions/opstack.instructions.md)
@@ -82,13 +82,13 @@ Use opstack-ui-review to check the mobile checkout and its error states.
 | `opstack-setup` | Client-aware installation and default activation |
 | `opstack-help` | Picks a starting workflow and gives an invocation |
 
-The main agent keeps architecture, integration, and verification. The default personal setup enables native swarms for useful independent work: GPT 6.1 Sol / Claude Opus 5.5 main-agent preferences, with explicitly selected cheaper Luna/Sonnet workers. Resolve actual model IDs from the client; never silently inherit an expensive main model for workers. Without suitable native delegation/model selection, work sequentially and report the limit. Worker output is verified by the main agent.
+The main agent keeps architecture, integration, and verification. The default personal setup enables native swarms for useful independent work: GPT 6.1 Sol / Claude Opus 5.5 main-agent preferences, with explicitly selected smaller, cheaper workers available in the developer’s environment. Resolve actual model IDs from the client; never silently inherit an expensive main model for workers. Without suitable native delegation/model selection, work sequentially and report the limit. Worker output is verified by the main agent.
 
 For stateful changes, review the real transition guards under retries, timeouts, concurrency, crash/restart, and sleep/wake. Keep the repository's state-machine document current when relevant. For simple wording or style changes, a proportionate check is enough. Workflows do not add permission to publish, merge, send messages, or change accounts.
 
 ## Native swarm
 
-opstack owns the swarm workflow and model-role policy. The client provides the actual subagent execution; no QuickJS/PTC swarm runtime or external orchestrator is required. The strong main agent plans and verifies; up to three Luna/Sonnet workers take independent bounded tasks. Only parent-verified results unblock dependencies. Writers never share ownership of a file concurrently. Retries wait for the previous worker to stop, use a new attempt ID, and reject stale results.
+opstack owns the swarm workflow and model-role policy. The client provides the actual subagent execution; no QuickJS/PTC swarm runtime or external orchestrator is required. The strong main agent plans and verifies; up to three suitable smaller, cheaper workers take independent bounded tasks. Only parent-verified results unblock dependencies. Writers never share ownership of a file concurrently. Retries wait for the previous worker to stop, use a new attempt ID, and reject stale results.
 
 [Workflow](skills/opstack-swarm/SKILL.md) · [Model policy example](skills/opstack-swarm/references/model-policy.example.json) · [Client adapters](skills/opstack-swarm/references/clients.md)
 

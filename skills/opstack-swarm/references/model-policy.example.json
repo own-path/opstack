@@ -14,13 +14,16 @@
     ]
   },
   "worker": {
-    "allowed_tiers": [
-      "luna",
-      "sonnet"
-    ],
     "native_model_id": null,
     "allow_inherit": false,
-    "allow_expensive_fallback": false
+    "allow_expensive_fallback": false,
+    "selection": "smallest_capable_lower_cost_model_in_developer_environment",
+    "family_allowlist": null,
+    "examples_only": [
+      "Luna",
+      "Sonnet"
+    ],
+    "cost_basis": "client cost tier, configured rates, or developer-approved choice"
   },
   "limits": {
     "max_workers": 3,

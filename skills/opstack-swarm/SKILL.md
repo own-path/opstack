@@ -1,6 +1,6 @@
 ---
 name: opstack-swarm
-description: Run opstack's native multi-agent workflow for independent discovery, implementation slices, or review lenses. A strong main model owns planning and verification; cheaper Luna or Sonnet workers execute bounded tasks using the relevant installed skills from Daryl's 146-skill library.
+description: Run opstack's native multi-agent workflow for independent discovery, implementation slices, or review lenses. A strong main model owns planning and verification; smaller, cheaper workers available in the developer’s environment execute bounded tasks using the relevant installed skills from Daryl's 146-skill library.
 ---
 
 # Native opstack swarm
@@ -9,9 +9,9 @@ opstack owns the plan, role policy, briefs, task lifecycle, and verification. Us
 
 ## Resolve roles before dispatch
 
-The main agent is the orchestrator: preferred models are GPT 6.1 Sol or Claude Opus 5.5. It owns repository understanding, architecture, task decomposition, integration, and final verification. Workers use the cheaper Luna or Sonnet tiers. See [model policy](references/model-policy.example.json) and [client adapters](references/clients.md).
+The main agent is the orchestrator: preferred models are GPT 6.1 Sol or Claude Opus 5.5. It owns repository understanding, architecture, task decomposition, integration, and final verification. Workers use a smaller, lower-cost model available in the developer’s environment that is capable of the assigned task. Luna and Sonnet are examples, not an exclusive list. See [model policy](references/model-policy.example.json) and [client adapters](references/clients.md).
 
-Identify actual model IDs/aliases offered by the current client's tools or model picker. Use the configured explicit worker model on every dispatch; never let workers silently inherit the main model. Verify the effective model from runtime metadata when available. A prompt that calls a worker "Luna" does not select that model. Do not silently substitute an expensive model, change the main conversation's model, or bypass organization restrictions. If a cheaper worker cannot be selected, do the work sequentially in the main session and report that fallback. If the client substitutes a different model, stop further dispatch and reconcile the mapping. Do not claim an unobservable effective model was confirmed.
+Identify actual model IDs/aliases offered by the current client’s tools or model picker. Select the smallest/lightest available model that can meet the task’s acceptance criteria and is lower-cost than the orchestrator under the developer’s environment or approved budget policy. Use client-provided cost tiers, configured rates, or the developer’s explicit selection; do not infer price from a family name. There is no model-family allowlist. If relative cost is unknown, report that uncertainty and resolve the worker choice rather than claiming it is cheaper. Use the configured explicit worker model on every dispatch; never let workers silently inherit the main model. Verify the effective model from runtime metadata when available. A prompt that calls a worker "cheap" does not select a model or establish its cost. Do not silently substitute an expensive model, change the main conversation's model, or bypass organization restrictions. If a cheaper worker cannot be selected, do the work sequentially in the main session and report that fallback. If the client substitutes a different model, stop further dispatch and reconcile the mapping. Do not claim an unobservable effective model was confirmed.
 
 Start with up to 3 active workers, bounded by the client's available capacity and the user's limits. Use fewer when that is enough. Never create recursive swarms. Follow user-configured role choices when they differ from the example.
 
