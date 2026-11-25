@@ -5,6 +5,13 @@ description: "Review state machines and lifecycle transitions before committing 
 
 # Review state and transitions
 
+## Foundation in the selected skills
+
+[langgraph-persistence](../langgraph-persistence/SKILL.md), [deep-agents-memory](../deep-agents-memory/SKILL.md), [write-swift](../write-swift/SKILL.md), [solana-dev](../solana-dev/SKILL.md)
+
+Combine Daryl’s standing state-machine review preference with the applicable domain’s persistence, concurrency, memory, or transaction rules. These sources inform the relevant domain; do not require LangGraph or Solana in a different project. Read only the sources applicable to the current task and preserve their scope and requirements.
+
+
 Scale the check: wording or styling needs a glance; lifecycle, retries, background work, approvals, locks, and persistence need a full review. Look for docs/state-machines.md or the repository's equivalent. When a full review is needed and no document exists, audit the relevant explicit and implicit machines and document them in a separate coherent change. Do not interrupt a small unrelated edit with a whole-repository rewrite.
 
 For each affected machine, identify states, owners, invariants, allowed transitions, transition guards, and side effects. Look beyond enums: booleans, nullable IDs, lock files, heartbeats, and timestamps can encode a stage together.

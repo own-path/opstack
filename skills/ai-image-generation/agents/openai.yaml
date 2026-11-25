@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI Image Generation"
+  short_description: "Generate and edit images through inference.sh"
+  default_prompt: "Use $ai-image-generation to generate or edit an image with an AI image model."

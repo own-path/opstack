@@ -3,7 +3,7 @@
 Paste this into your coding agent after cloning or downloading this repository:
 
 ```text
-Set up or update opstack as my default personal coding workflow. Read README.md and use the supported setup for this client. Preserve customized skills and existing company/repository rules; use --only opstack-swarm to add swarm without overwriting older skills. Enable native opstack-swarm for useful independent tasks. Keep planning, architecture, integration, and verification on a strong main model such as GPT 6.1 Sol or Claude Opus 5.5; explicitly select smaller, cheaper workers available in the developer’s environment from this client's available models, with no silent expensive fallback. Import my exported 146-skill library if needed and run --check-library; report missing skills rather than claiming full setup. Register instructions/opstack.instructions.md at personal scope and verify activation in a fresh chat where possible.
+Set up opstack from this repository as my default personal coding stack. Install the bundled 146 domain skills and 13 opstack workflows for this client, run --check-library, and preserve existing customizations and company/repository rules. Register instructions/opstack.instructions.md at personal scope. Use the relevant bundled domain skills for each task and pass them explicitly to swarm workers. Keep planning, architecture, integration, and verification on the strong main model; select capable smaller, cheaper workers available in this developer environment, with no silent expensive fallback. Verify skill discovery and default activation in a fresh chat where possible.
 ```
 
 For an agent that cannot register personal instructions, attach `instructions/opstack.instructions.md` to the chat and say:

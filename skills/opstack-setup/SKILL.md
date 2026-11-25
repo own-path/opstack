@@ -5,7 +5,14 @@ description: "Install or check opstack for Copilot, Cursor, Claude, or Codex and
 
 # Set up opstack
 
-Identify the active client and supported personal skill location before copying anything. Read the distribution README and use its Python installer when the repository is available. Run a dry run first; preserve conflicting skills and existing personal instructions. Core installs 13 original workflows, including native opstack-swarm. For an existing installation, `--only opstack-swarm` adds the new swarm skill without replacing customized older skills; compare and back up changed older opstack folders before reconciling and reinstalling them. Never force-overwrite local edits. Full-stack setup uses `--library PATH --require-library` and verifies all 146 domain skills with `--check-library`. If the archive is unavailable, locate it with the user or report core-only setup; a repo clone alone does not contain it. The local-library import adds the user's own previously exported skills; do not fetch an unverified archive or execute bundled helpers during installation.
+## Foundation in the selected skills
+
+[skill-installer](../skill-installer/SKILL.md), [plugin-management](../plugin-management/SKILL.md), [find-skills](../find-skills/SKILL.md)
+
+Use the selected installer/discovery/plugin guidance within its stated scope when extending or connecting the stack. Installing this already-bundled repository uses opstack’s local copier; it does not need to download the selected skills again or connect accounts. Read only the sources applicable to the current task and preserve their scope and requirements.
+
+
+Identify the active client and supported personal skill location before copying anything. Read the distribution README and use its Python installer when the repository is available. Run a dry run first; preserve conflicting skills and existing personal instructions. The default install copies all 146 bundled domain skills plus 13 opstack workflows: 159 primary skills. No separate archive is needed. Run `--require-library` for a full install and `--check-library` afterwards. The repo includes scripts, assets, references, and two Claude alternate versions; the installer selects the alternates for Claude automatically. For existing installs, compare conflicting folders, keep a dated backup, and reconcile custom edits before replacing them. Never force-overwrite local work. `--only` deliberately installs a subset and does not claim full-stack setup. Do not execute bundled domain helpers merely to install them.
 
 For default activation, use the distribution's DEFAULT-PROMPT.md and instructions/opstack.instructions.md. Register the instruction text at personal user scope through the actual client's supported mechanism. Do not put personal defaults in a shared employer repository unless the user explicitly requests that scope. Installing a skill and making a default instruction active are separate steps.
 

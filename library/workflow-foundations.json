@@ -1,0 +1,135 @@
+{
+  "description": "How opstack workflows use the actual selected domain skills; this does not replace their full instructions.",
+  "workflows": [
+    {
+      "workflow": "opstack-mode",
+      "based_on": [
+        "find-skills",
+        "ecosystem-primer",
+        "ask-emil"
+      ],
+      "adaptation": "Use the existing discovery/router skills for their actual domains, then route to the relevant selected skill rather than substituting a generic recipe. The complete routing index covers all 146."
+    },
+    {
+      "workflow": "opstack-discover",
+      "based_on": [
+        "find-skills",
+        "databricks-data-discovery",
+        "openai-docs",
+        "hf-cli"
+      ],
+      "adaptation": "Use find-skills for capability discovery, databricks-data-discovery for Databricks data questions, openai-docs for its OpenAI scope, and hf-cli for Hugging Face resources. Keep codebase tracing grounded in the repository; these domain skills are not universal repository crawlers."
+    },
+    {
+      "workflow": "opstack-architect",
+      "based_on": [
+        "ecosystem-primer",
+        "langgraph-fundamentals",
+        "write-swift",
+        "databricks-app-design",
+        "databricks-apps"
+      ],
+      "adaptation": "Use the applicable framework/modeling/design skill to shape the actual architecture. Do not apply a framework-specific prescription to an unrelated codebase."
+    },
+    {
+      "workflow": "opstack-build",
+      "based_on": [
+        "emil-design-eng",
+        "write-swift",
+        "solana-dev",
+        "langchain-fundamentals",
+        "databricks-apps"
+      ],
+      "adaptation": "Select the implementation skill that matches the codebase and follow its concrete patterns and supporting references. The workflow below manages delivery around that implementation guidance."
+    },
+    {
+      "workflow": "opstack-debug",
+      "based_on": [
+        "break-ui",
+        "animation-performance",
+        "write-swift",
+        "langsmith-trace",
+        "databricks-mlflow-tracing"
+      ],
+      "adaptation": "Use the matching reproduction, performance, language, or tracing skill to investigate the defect. Load additional domain skills from the routing index when the failing path requires them."
+    },
+    {
+      "workflow": "opstack-review",
+      "based_on": [
+        "review-agent",
+        "review-animations",
+        "break-ui",
+        "write-swift"
+      ],
+      "adaptation": "For code review, use review-agent\u2019s introduced-defect criteria, complete-diff inspection, caller/test checks, precise findings, and read-only boundary. Add animation/UI/language review skills when those domains are in the diff. Review workers do not delegate further."
+    },
+    {
+      "workflow": "opstack-state-review",
+      "based_on": [
+        "langgraph-persistence",
+        "deep-agents-memory",
+        "write-swift",
+        "solana-dev"
+      ],
+      "adaptation": "Combine Daryl\u2019s standing state-machine review preference with the applicable domain\u2019s persistence, concurrency, memory, or transaction rules. These sources inform the relevant domain; do not require LangGraph or Solana in a different project."
+    },
+    {
+      "workflow": "opstack-ui-review",
+      "based_on": [
+        "emil-design-eng",
+        "break-ui",
+        "mobile-native",
+        "gestures",
+        "review-animations",
+        "animation-performance",
+        "pick-ui-library"
+      ],
+      "adaptation": "Use these actual design, worst-case content, mobile, gesture, motion, and library-selection skills as the UI review method. Read the matching SKILL.md and required references, then use the checklist below to coordinate and verify the result."
+    },
+    {
+      "workflow": "opstack-verify",
+      "based_on": [
+        "eval-engineering",
+        "langsmith-evaluator",
+        "databricks-aibi-dashboards",
+        "manimce-best-practices"
+      ],
+      "adaptation": "Use the domain skill\u2019s actual validation method: evaluation/verifier evidence for agent work, evaluator construction for LangSmith, query validation for Databricks dashboards, and rendering checks for Manim. Keep checks proportionate and scoped to the domain."
+    },
+    {
+      "workflow": "opstack-learn",
+      "based_on": [
+        "learn-taste",
+        "skill-creator"
+      ],
+      "adaptation": "Base design-preference capture on learn-taste: trace rules to the user, preserve their reason, never invent preferences, and respect its approval requirements. Use skill-creator when the requested reusable result is a skill. An explicitly approved exact rule does not need approval again; inferred or expanded rules do."
+    },
+    {
+      "workflow": "opstack-setup",
+      "based_on": [
+        "skill-installer",
+        "plugin-management",
+        "find-skills"
+      ],
+      "adaptation": "Use the selected installer/discovery/plugin guidance within its stated scope when extending or connecting the stack. Installing this already-bundled repository uses opstack\u2019s local copier; it does not need to download the selected skills again or connect accounts."
+    },
+    {
+      "workflow": "opstack-help",
+      "based_on": [
+        "ask-emil",
+        "animation-vocabulary",
+        "find-skills"
+      ],
+      "adaptation": "Use the existing design/motion and capability-discovery routers in their domains, and the complete selected-skill index for other tasks. Recommend the actual relevant selected skill, with an opstack workflow only when coordination is needed."
+    },
+    {
+      "workflow": "opstack-swarm",
+      "based_on": [
+        "swarm",
+        "review-agent",
+        "eval-engineering"
+      ],
+      "adaptation": "Adapt the selected swarm skill\u2019s task-table \u2192 dispatch \u2192 aggregate \u2192 targeted-retry structure to the client\u2019s native subagent runtime. Keep one row per bounded work item and structured results; the main agent aggregates. Replace its QuickJS/PTC execution dependency with native client tools, while preserving the coordination pattern. Use review-agent for read-only review workers and eval-engineering when designing agent evaluation/verifier tasks. Daryl\u2019s model-role and verification preferences govern orchestration."
+    }
+  ]
+}

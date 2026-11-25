@@ -5,6 +5,13 @@ description: Run opstack's native multi-agent workflow for independent discovery
 
 # Native opstack swarm
 
+## Foundation in the selected skills
+
+[swarm](../swarm/SKILL.md), [review-agent](../review-agent/SKILL.md), [eval-engineering](../eval-engineering/SKILL.md)
+
+Adapt the selected swarm skill’s task-table → dispatch → aggregate → targeted-retry structure to the client’s native subagent runtime. Keep one row per bounded work item and structured results; the main agent aggregates. Replace its QuickJS/PTC execution dependency with native client tools, while preserving the coordination pattern. Use review-agent for read-only review workers and eval-engineering when designing agent evaluation/verifier tasks. Daryl’s model-role and verification preferences govern orchestration. Read only the sources applicable to the current task and preserve their scope and requirements.
+
+
 opstack owns the plan, role policy, briefs, task lifecycle, and verification. Use the current client's native subagent execution and result collection. Use opstack-swarm for orchestration even when the older imported `swarm` skill is present. This workflow does not require that optional QuickJS swarm skill, a third-party orchestration framework, or separate model credentials.
 
 ## Resolve roles before dispatch
@@ -17,11 +24,11 @@ Start with up to 3 active workers, bounded by the client's available capacity an
 
 ## Attach the domain library
 
-The [catalog](references/library-catalog.json) lists the 146 selected skills across UI (21), coding/tooling (13), AI (22), Databricks (38), visuals (8), documents (24), and templates (20). Identify which are actually installed or exposed by the client. A catalog entry alone is not an installed capability. Full-stack setup must check all 146; explicitly report missing skills and unavailable integrations.
+The [catalog](references/library-catalog.json) indexes the 146 bundled skills across UI (21), coding/tooling (13), AI (22), Databricks (38), visuals (8), documents (24), and templates (20). All 146 are bundled as sibling folders in this repository and installed by default with opstack. Identify which are actually discovered or exposed by the active client. A catalog entry alone is not an installed capability. Full-stack setup must check all 146; explicitly report missing skills and unavailable integrations.
 
 Choose only the relevant domain skills per task and give each worker their exact names, accessible SKILL.md paths or provided instructions, and required supporting references. Do not assume a worker inherits the parent's loaded skills or conversation. A UI task may use break-ui and mobile-native; a Swift task write-swift; an AI task ecosystem-primer plus the appropriate framework skill; a Databricks task its relevant core and domain skills. Do not load all 146 into every worker or substitute copied instructions for missing service tools.
 
-If the full library is absent, say which relevant skills are missing. Continue with the self-contained opstack workflows when useful and label that as core-only execution; do not claim it used the full stack. Model tiers and task permissions apply even if an imported skill recommends a different model or nested agents.
+If a partial or old installation is missing skills, say which relevant skills are missing. Continue with the self-contained opstack workflows when useful and label that as core-only execution; do not claim it used the full stack. Model tiers and task permissions apply even if an imported skill recommends a different model or nested agents.
 
 ## Plan ready, independent work
 

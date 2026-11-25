@@ -19,7 +19,7 @@ Before claiming behavioral compliance, open a fresh chat, verify discovery and i
 
 ## Native swarm scenarios
 
-Evaluate with the main model and explicit cheaper workers selected in the client. Verify model metadata where exposed, rather than relying on role labels. Include: overlapping writes, a returned-but-unverified prerequisite, a failed dependency, an unresponsive worker retaining ownership, a late result from a superseded attempt, user cancellation, a read-only review swarm, an unavailable cheap worker model, and a missing relevant domain skill. Reviewers can inspect the same fixed diff; writers cannot own the same file at the same time.
+Evaluate with the main model and explicit cheaper workers selected in the client. Verify model metadata where exposed, rather than relying on role labels. Include: overlapping writes, a returned-but-unverified prerequisite, a failed dependency, an unresponsive worker retaining ownership, a late result from a superseded attempt, user cancellation, a read-only review swarm, an unavailable cheap worker model, and a partial installation missing a relevant bundled domain skill. Reviewers can inspect the same fixed diff; writers cannot own the same file at the same time.
 
 During development, an explicitly selected `gpt-6-luna` worker independently evaluated a task-dependency/ownership/retry scenario from these instructions. The main agent checked its conclusions against the protocol. This was a read-only behavioral spot check in the development runtime, not certification of every client's model routing or parallel implementation safety.
 

@@ -1,48 +1,115 @@
 # opstack
 
-**Daryl's engineering workflow, across coding agents.**
+**Daryl’s 146 selected skills, organized into a native coding stack.**
 
-Understand the codebase. Shape the change. Build with intent. Review the transitions. Verify the behavior.
+The actual skill folders, scripts, references, templates, and assets are in this repository under [`skills/`](skills/). A normal clone contains the full library. No separate ZIP, private archive, or import step is required.
 
-opstack turns those habits into 13 focused skills for Copilot, Cursor, Claude Code, and Codex. It includes a native swarm, a default mode, repository discovery, architecture, implementation, debugging, code review, state-machine review, UI review, verification, and learning from corrections. Simple edits stay simple.
+The **146 domain skills are the foundation**. Thirteen opstack workflows provide planning, native multi-agent coordination, review, and verification around them: **159 primary skills installed by default**. Workers receive the domain skills relevant to their assigned task; the workflow layer does not replace those skills.
 
-## Make it your default
+## Where the 146 skills are
 
-Clone this repo, open it in your agent, and paste:
+[Browse the complete grouped list](library/README.md) · [Workflow foundations](library/workflow-foundations.json) · [Source/provenance records](library/provenance.json) · [Domain routing index](skills/opstack-mode/references/domain-routing.md)
 
-```text
-Set up or update opstack as my default personal coding workflow. Read README.md and use the supported setup for this client. Preserve customized skills and existing company/repository rules; use --only opstack-swarm to add swarm without overwriting older skills. Enable native opstack-swarm for useful independent tasks. Keep planning, architecture, integration, and verification on a strong main model such as GPT 6.1 Sol or Claude Opus 5.5; explicitly select smaller, cheaper workers available in the developer’s environment from this client's available models, with no silent expensive fallback. Import my exported 146-skill library if needed and run --check-library; report missing skills rather than claiming full setup. Register instructions/opstack.instructions.md at personal scope and verify activation in a fresh chat where possible.
-```
+| Selected group | Count | Examples bundled in this repo |
+| --- | ---: | --- |
+| UI design, implementation, reviews | 21 | `emil-design-eng`, `break-ui`, `mobile-native`, `review-animations` |
+| Code review, development, discovery, tooling | 13 | `review-agent`, `write-swift`, `eval-engineering`, `find-skills` |
+| AI application development | 22 | `ecosystem-primer`, `langchain-rag`, `langgraph-fundamentals`, `langsmith-evaluator` |
+| Databricks development, data, operations | 38 | `databricks-core`, `databricks-apps`, `databricks-jobs`, `databricks-unity-catalog` |
+| Visual assets, programmatic animation | 8 | `imagegen`, `canvas-design`, `manim-composer`, `visualize` |
+| Documents and workspace tools | 24 | `documents`, `pdf`, `google-docs`, `spreadsheets` |
+| Artifact templates | 20 | `artifact-template-system-design`, `artifact-template-project-tracker` |
+| **Selected domain skills** | **146** | **Real folders and supporting files under `skills/`** |
 
-[Default prompt and fallback](DEFAULT-PROMPT.md) · [Personal instruction template](instructions/opstack.instructions.md)
+Skill folders are flat so sibling references resolve after installation. The grouped list retains your seven categories. Two alternate Claude versions of `pdf` and `skill-creator` are preserved under [`variants/claude/`](variants/claude/); the Python installer selects those for Claude, keeping the primary installed count at 159.
 
-## Install
+## Install the full stack
 
-Python 3.9 or newer, standard library only. No service accounts, model routing, or external dependencies are configured during installation.
+Use a supported work-approved Python runtime, preferably **Python 3.12 or newer**. The installer uses only the standard library and remains compatible with Python 3.9+; it does not install or downgrade Python.
 
 ```sh
-git clone git@github.com:own-path/opstack.git
+git clone https://github.com/own-path/opstack.git
 cd opstack
-python3 scripts/install.py --agent copilot --dry-run
-python3 scripts/install.py --agent copilot
+python3 scripts/install.py --agent copilot --require-library --dry-run
+python3 scripts/install.py --agent copilot --require-library
+python3 scripts/install.py --agent copilot --check-library
 ```
 
-Use `--agent cursor`, `--agent claude`, or `--agent codex` for another client. On Windows use `py -3` instead of `python3`. Add `--target PATH` to use a custom skills location.
+Expected result: **159 installed skills**, and **146/146 domain skills available**. On Windows use `py -3` instead of `python3`. The availability check validates basic entrypoint names/frontmatter and rejects symlinked entrypoints; it does not prove that a model has loaded the skills or that every external integration works.
 
-| Client | Default personal destination | Invocation |
+| Client | Installer argument | Default user-level destination |
 | --- | --- | --- |
-| Copilot | `~/.copilot/skills` | Ask it to use `opstack-mode`, or select the discovered skill |
-| Cursor | `~/.cursor/skills` | `/opstack-mode` |
-| Claude Code | `~/.claude/skills` | `/opstack-mode` for copied personal skills |
-| Codex | `~/.codex/skills` | `$opstack-mode` |
+| Copilot | `--agent copilot` | `~/.copilot/skills` |
+| Cursor | `--agent cursor` | `~/.cursor/skills` |
+| Claude Code | `--agent claude` | `~/.claude/skills` |
+| Codex | `--agent codex` | `~/.codex/skills` |
 
-The installer verifies source and destination files. Identical existing skills stay unchanged. Conflicting skills stop installation before copies begin. It never merges into or overwrites an existing skill directory. An installation lock prevents two opstack installers from writing the same target concurrently. Filesystem errors can leave a partial new skill folder; reconcile that folder or choose a fresh target before retrying.
+The default is personal across projects, not system-wide. For one repository, pass its supported skill directory explicitly; for example, from a Copilot project use `--target .github/skills`. Files there may enter version control if committed. No credentials, model clients, service accounts, or external packages are installed.
 
-Installing skills does **not** activate always-on instructions. Use the prompt above to register the personal template through your client's supported customization mechanism. For VS Code, use **Chat: Open Customizations → Instructions → + next to User**. For other clients use their supported personal instructions or user rules. Preserve the existing instruction text. If a personal default is unsupported, attach the template to the chat and invoke the skill explicitly. Local settings do not automatically configure remote/cloud agents.
+### Existing installations
 
-### Native plugins
+The installer skips identical skills and stops before copying if a selected existing skill differs. Compare those folders, keep a dated backup, and reconcile personal edits before replacing them. No force-overwrite mode is provided. Native plugin users update through their client’s plugin manager.
 
-Cursor: import `own-path/opstack` through Customize → From GitHub Repository; this repo supplies `.cursor-plugin/marketplace.json` and the `opstack` plugin manifest. The repo is ready for repository import; it is not claimed to be listed in the public Cursor marketplace.
+`--only NAME ...` intentionally installs a subset and preserves everything else. It is useful for a targeted addition, but it is not a full-stack install. `--check-library` reports missing skills without changing files. The old `--library` archive-import option is no longer needed or supported: the selected library is now part of this repo.
+
+## Make it the default workflow
+
+Open this cloned repo in your agent and paste:
+
+```text
+Set up opstack from this repository as my default personal coding stack. Install the bundled 146 domain skills and 13 opstack workflows for this client, run --check-library, and preserve existing customizations and company/repository rules. Register instructions/opstack.instructions.md at personal scope. Use the relevant bundled domain skills for each task and pass them explicitly to swarm workers. Keep planning, architecture, integration, and verification on the strong main model; select capable smaller, cheaper workers available in this developer environment, with no silent expensive fallback. Verify skill discovery and default activation in a fresh chat where possible.
+```
+
+[Copy the default prompt](DEFAULT-PROMPT.md) · [Personal instruction template](instructions/opstack.instructions.md)
+
+Installing skills and activating default instructions are separate steps. Register the template at personal user scope using your client’s supported instructions or user-rules mechanism, preserving existing guidance. For VS Code use **Chat: Open Customizations → Instructions → + next to User**. If personal defaults are unsupported, attach the template to the chat and invoke `opstack-mode` explicitly. Local settings do not automatically configure cloud/remote agents.
+
+## How opstack uses your skills
+
+Each opstack workflow explicitly names and links the selected skills it is based on. For example, `opstack-review` uses `review-agent` plus relevant language/UI review skills; `opstack-ui-review` uses your actual design, mobile, gesture, and animation skills; `opstack-learn` uses `learn-taste` and `skill-creator`; native `opstack-swarm` adapts your selected `swarm` skill’s task-table/dispatch/aggregate/retry pattern to native client subagents. See the [complete workflow-to-skill foundation map](library/workflow-foundations.json).
+
+The main agent reads the [domain routing index](skills/opstack-mode/references/domain-routing.md), selects the relevant bundled skills, and reads their actual `SKILL.md` and required references. For example:
+
+- UI work uses the relevant design, component, mobile, gesture, and motion skills.
+- AI agent work starts with `ecosystem-primer`, then the appropriate framework and evaluation skills.
+- Databricks work uses the applicable core and domain skills.
+- A swarm worker receives exact domain skill names and accessible paths/instructions in its bounded brief.
+
+Only relevant skills are loaded for a task; all 146 do not enter every worker’s context. Some bundled skills require provider-specific tools, applications, or accounts. The agent must report unavailable capabilities and use a supported approach where possible; copying instructions does not create those integrations.
+
+## Native swarm
+
+[`opstack-swarm`](skills/opstack-swarm/SKILL.md) is part of opstack itself. It uses client-native subagents, with no QuickJS/PTC swarm runtime or third-party orchestration framework. The older bundled `swarm` skill remains available for its original QuickJS environment; it does not replace opstack’s native orchestration.
+
+The strong main agent owns planning, architecture, integration, and final verification. Examples include GPT 6.1 Sol or Claude Opus 5.5. Workers use **capable smaller, cheaper models available in the developer’s environment**. Luna/Sonnet are examples, not an allowlist. Resolve actual supported model IDs and relative cost from the client or developer-approved configuration; never silently inherit an expensive main model or claim an unknown price is cheaper.
+
+Run up to three independent workers by default. Parallel discovery and review stay read-only. Implementation workers have separate file ownership; shared interfaces are settled first. Only parent-verified results unblock dependencies. A retry waits for the previous worker to stop, uses a new attempt ID, and rejects stale results. If suitable delegation/model selection is unavailable, work sequentially and report that limit.
+
+[Model policy example](skills/opstack-swarm/references/model-policy.example.json) · [Client adapters](skills/opstack-swarm/references/clients.md) · [Task lifecycle](skills/opstack-swarm/references/lifecycle.md)
+
+## Workflow entrypoints
+
+| Workflow | Purpose |
+| --- | --- |
+| `opstack-mode` | Select domain skills and coordinate delivery |
+| `opstack-swarm` | Native parallel discovery, implementation slices, and review lenses |
+| `opstack-discover` | Map relevant code and checks |
+| `opstack-architect` | Shape boundaries, invariants, and validation |
+| `opstack-build` | Implement with repository and domain conventions |
+| `opstack-debug` | Reproduce, explain, and prove a fix |
+| `opstack-review` | Read-only actionable defect review |
+| `opstack-state-review` | Lifecycle, ownership, retries, and concurrency |
+| `opstack-ui-review` | Coordinate interface checks with your UI skills |
+| `opstack-verify` | Check actual behavior and report evidence |
+| `opstack-learn` | Capture explicit corrections at the right scope |
+| `opstack-setup` | Install the full stack and activate defaults |
+| `opstack-help` | Pick the right skill or workflow |
+
+Example: `Use opstack-mode to add cancellation to this export job.` For a review: `Use opstack-swarm to review this branch with independent correctness and state-transition lenses; keep it read-only.`
+
+## Native plugins
+
+Cursor: import `own-path/opstack` through **Customize → From GitHub Repository**. This repo provides its marketplace and plugin manifests; it is not claimed to be listed in the public Cursor marketplace.
 
 Claude Code:
 
@@ -51,84 +118,15 @@ Claude Code:
 /plugin install opstack@opstack
 ```
 
-Native Claude plugin commands are namespaced, for example `/opstack:opstack-mode`. For a local development session, `claude --plugin-dir /absolute/path/to/opstack` loads this plugin. Use either the native plugin or copied personal skills in a client to avoid duplicate skill discovery.
+Native Claude commands are namespaced, for example `/opstack:opstack-mode`. Native plugins discover the 159 primary skill folders; the Python Claude installer additionally selects the two bundled Claude-specific alternates. Use either native plugins or copied personal skills in a client to avoid duplicate discovery. Codex plugin metadata is included; the documented Codex setup path is the Python installer.
 
-The `.codex-plugin/plugin.json` metadata is included for plugin packaging. The Python personal-skills installer is the documented Codex setup path. Native manifest validation and client runtime behavior should be verified with the actual client; automated tests here cover the package and installer.
-
-## Use it
-
-```text
-Use opstack-mode to add cancellation to the background export job.
-Use opstack-discover to explain how authentication reaches the database.
-Use opstack-swarm to review this branch with independent correctness and state-transition lenses.
-Use opstack-review to review this branch against main. Keep it read-only.
-Use opstack-state-review to check retries, timeouts, and stale workers.
-Use opstack-ui-review to check the mobile checkout and its error states.
-```
-
-| Skill | Outcome |
-| --- | --- |
-| `opstack-swarm` | Native parallel discovery, independent implementation slices, and review lenses using cheaper workers |
-| `opstack-mode` | Routes the task and owns delivery and verification |
-| `opstack-discover` | Evidence-backed map of the relevant code and checks |
-| `opstack-architect` | Data shapes, boundaries, invariants, and validation plan |
-| `opstack-build` | Focused implementation using the repository's conventions |
-| `opstack-debug` | Reproduction, root cause, regression proof, and fix |
-| `opstack-review` | Actionable diff findings, ordered by severity |
-| `opstack-state-review` | Transition guards, invariants, ownership, and lifecycle risks |
-| `opstack-ui-review` | Interaction, accessibility, responsive, and motion checks |
-| `opstack-verify` | Actual behavior checks with honest limits |
-| `opstack-learn` | Narrow, scoped rules from explicit corrections |
-| `opstack-setup` | Client-aware installation and default activation |
-| `opstack-help` | Picks a starting workflow and gives an invocation |
-
-The main agent keeps architecture, integration, and verification. The default personal setup enables native swarms for useful independent work: GPT 6.1 Sol / Claude Opus 5.5 main-agent preferences, with explicitly selected smaller, cheaper workers available in the developer’s environment. Resolve actual model IDs from the client; never silently inherit an expensive main model for workers. Without suitable native delegation/model selection, work sequentially and report the limit. Worker output is verified by the main agent.
-
-For stateful changes, review the real transition guards under retries, timeouts, concurrency, crash/restart, and sleep/wake. Keep the repository's state-machine document current when relevant. For simple wording or style changes, a proportionate check is enough. Workflows do not add permission to publish, merge, send messages, or change accounts.
-
-## Native swarm
-
-opstack owns the swarm workflow and model-role policy. The client provides the actual subagent execution; no QuickJS/PTC swarm runtime or external orchestrator is required. The strong main agent plans and verifies; up to three suitable smaller, cheaper workers take independent bounded tasks. Only parent-verified results unblock dependencies. Writers never share ownership of a file concurrently. Retries wait for the previous worker to stop, use a new attempt ID, and reject stale results.
-
-[Workflow](skills/opstack-swarm/SKILL.md) · [Model policy example](skills/opstack-swarm/references/model-policy.example.json) · [Client adapters](skills/opstack-swarm/references/clients.md)
-
-The model-policy JSON records preferences; copying it does not configure a client's models. At setup, the agent resolves the available main/worker model IDs and saves that mapping in personal instructions/settings. If the runtime cannot explicitly select a cheaper worker, it reports the limit and executes sequentially.
-
-### Add swarm to an existing installation
-
-```sh
-git pull
-python3 scripts/install.py --agent copilot --only opstack-swarm --dry-run
-python3 scripts/install.py --agent copilot --only opstack-swarm
-```
-
-Then use the updated default prompt above to refresh your personal instructions and activate swarm. `--only` preserves every older skill, including local edits. A full reinstall still stops if older skills differ: compare those opstack folders, keep a dated backup, and reconcile deliberately before installing the newer copies. Native plugin users update their plugin through the client's plugin manager instead. No force-overwrite option is added.
-
-## Full stack: your 146 domain skills
-
-The 13 original workflows have no dependency on a private library or a provider-specific tool. If you have Daryl's previously exported `portable-skills` archive, extract it locally and add it to the same personal skill destination:
-
-```sh
-python3 scripts/install.py --agent copilot --library /path/to/portable-skills --require-library --dry-run
-python3 scripts/install.py --agent copilot --library /path/to/portable-skills --require-library
-python3 scripts/install.py --agent copilot --check-library
-```
-
-For the previous `daryls-skills` repository export, point `--library` at its `library` folder. The importer checks the archive's manifest and file checksums, preserves scripts/assets/references, and flattens its 146 selected skills next to the 13 opstack skills: **159 installed skills**. Claude uses that archive's alternate `pdf` and `skill-creator` versions. Copilot and Cursor receive lowercase frontmatter names for the two original capitalized skills. Originals remain unchanged.
-
-The personal archive is not published in this public repo. A clone contains the 13 opstack workflows and a catalog of the 146 skills, not their contents. Full-stack setup must transfer/extract that archive locally and verify availability; it must not claim the 146 were installed from the public repo alone. Domain-specific integrations still require their corresponding tools and accounts on the destination. The swarm assigns the relevant installed UI, coding, AI, Databricks, visual, document, and template skills to each worker; a copied instruction cannot create an unavailable tool.
-
-## Develop and verify
+## Verify and maintain
 
 ```sh
 python3 scripts/install.py --verify
 python3 -m unittest discover -s tests -v
 ```
 
-After intentional changes, regenerate `integrity.json` with `python3 scripts/refresh_integrity.py`. Tests use temporary targets, not real user configuration. See [installer state transitions](docs/state-machines.md) and [behavioral evaluation cases](docs/evaluation.md). Structural and installer tests do not prove that a model will follow every instruction.
+After intentional changes regenerate `integrity.json` with `python3 scripts/refresh_integrity.py`. Keep the 146 domain folders and their supporting files intact; preserve source records and notices. Root MIT licensing applies to original opstack content; bundled third-party skills retain their original terms. Databricks license/notice files ship with its skills.
 
-## Sources and compatibility
-
-opstack's workflow text is original, grounded in Daryl's stated preferences. Its packaging was inspired by [pstack](https://github.com/cursor/plugins/tree/main/pstack); no pstack skill text or subagents are bundled.
-
-References checked while authoring: [Cursor plugin format](https://cursor.com/docs/plugins), [Cursor skill locations](https://cursor.com/docs/skills), [Claude plugin manifests](https://code.claude.com/docs/en/plugins/manifest-reference), [Copilot personal skills](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-skills), and [VS Code personal instructions](https://code.visualstudio.com/docs/agent-customization/custom-instructions). Codex metadata was compared with an installed plugin manifest; its personal-skills install path follows the user's existing local setup.
+Tests use temporary targets. Package/installer tests and native plugin validation do not certify every model’s behavior or every external service. See [state-machine notes](docs/state-machines.md) and [behavioral evaluation cases](docs/evaluation.md).

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Install opstack skills without changing client settings. Python 3.9+."""
+"""Install opstack skills without changing client settings. Use a supported Python 3.12+ runtime (code remains compatible with 3.9+)."""
 import argparse
 import hashlib
 import json
@@ -62,35 +62,6 @@ def instructions(src, agent):
     return text.encode('utf-8')
 
 
-def library_skills(base, agent):
-    base = base.expanduser().resolve()
-    manifest = json.loads((base / 'manifest.json').read_text())
-    checks = json.loads((base / 'checksums.json').read_text())
-    for row in checks:
-        p = contained(base, row['path'])
-        if not p.is_file() or digest(p) != row['sha256']:
-            raise ValueError('Local library integrity check failed: ' + row['path'])
-    hashes = {row['path']: row['sha256'] for row in checks}
-    variants = {row['name']: row for row in manifest['skills'] if row.get('variant') and 'claude' in row['path']}
-    result = []
-    for row in manifest['skills']:
-        if row.get('variant'):
-            continue
-        if agent == 'claude':
-            row = variants.get(row['name'], row)
-        name = row['name'].lower()
-        if not re.fullmatch(r'[a-z0-9]+(?:-[a-z0-9]+)*', name):
-            raise ValueError('Invalid library skill name: ' + name)
-        source = contained(base, row['path'])
-        if not (source / 'SKILL.md').is_file():
-            raise ValueError('Missing library skill: ' + name)
-        for rel, checksum in file_map(source).items():
-            if hashes.get((Path(row['path']) / rel).as_posix()) != checksum:
-                raise ValueError('Unverified library file: ' + name + '/' + rel)
-        result.append((source, name))
-    return result
-
-
 def domain_skill_available(target, name):
     folder = target / name
     entry = folder / 'SKILL.md'
@@ -110,7 +81,6 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--agent', choices=TARGETS, default='copilot')
     parser.add_argument('--target', type=Path, help='Override the personal skill destination')
-    parser.add_argument('--library', type=Path, help='Also import a local exported personal skill library')
     parser.add_argument('--only', nargs='+', metavar='SKILL', help='Install selected names only, preserving other installed skills')
     parser.add_argument('--check-library', action='store_true', help='Check whether all 146 domain skills are installed; no writes')
     parser.add_argument('--require-library', action='store_true', help='Refuse setup unless all 146 domain skills will be available')
@@ -127,11 +97,10 @@ def main(argv=None):
     if resolved == ROOT or ROOT in resolved.parents:
         raise ValueError('Choose an installation target outside this repository.')
     selected = [(p, p.name) for p in sorted((ROOT / 'skills').iterdir()) if p.is_dir() and (p / 'SKILL.md').is_file()]
-    if args.library:
-        library = args.library.expanduser().resolve()
-        if library == resolved or library in resolved.parents:
-            raise ValueError('Installation target must be outside the imported library.')
-        selected += library_skills(library, args.agent)
+    if args.agent == 'claude':
+        selected = [(ROOT / 'variants/claude' / name, name)
+                    if (ROOT / 'variants/claude' / name / 'SKILL.md').is_file()
+                    else (source, name) for source, name in selected]
     catalog = json.loads((ROOT / 'skills/opstack-swarm/references/library-catalog.json').read_text())
     required = {row['installed_name'] for row in catalog['skills']}
     if args.only:
@@ -150,7 +119,7 @@ def main(argv=None):
     if args.require_library:
         missing = required - available - {name for _, name in selected}
         if missing:
-            raise ValueError('Full-stack setup needs the personal archive via --library PATH. Missing domain skills: ' + ', '.join(sorted(missing)))
+            raise ValueError('Selected setup omits required bundled domain skills; remove --only for a full install. Missing domain skills: ' + ', '.join(sorted(missing)))
     if len({name for _, name in selected}) != len(selected):
         raise ValueError('Duplicate skill names in selected sources.')
     pending, conflicts, expected_maps = [], [], {}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Canvas Design"
+  short_description: "Static art, poster, PNG, and PDF design"
+  default_prompt: "Use $canvas-design to create a design philosophy and express it as a polished PNG or PDF."

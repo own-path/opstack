@@ -5,6 +5,13 @@ description: "Perform a read-only defect-focused review of a diff, commit, or br
 
 # Review a change
 
+## Foundation in the selected skills
+
+[review-agent](../review-agent/SKILL.md), [review-animations](../review-animations/SKILL.md), [break-ui](../break-ui/SKILL.md), [write-swift](../write-swift/SKILL.md)
+
+For code review, use review-agent’s introduced-defect criteria, complete-diff inspection, caller/test checks, precise findings, and read-only boundary. Add animation/UI/language review skills when those domains are in the diff. Review workers do not delegate further. Read only the sources applicable to the current task and preserve their scope and requirements.
+
+
 Resolve the requested diff and applicable repository instructions. For a branch review use its merge base with the intended target, resolving an upstream when appropriate. Inspect the complete diff and enough surrounding implementation, callers, and tests to understand the affected behavior. Keep review-only work read-only.
 
 Check correctness, architecture fit, security boundaries, error behavior, edge cases, and regressions. For stateful code read [opstack-state-review](../opstack-state-review/SKILL.md); for UI include [opstack-ui-review](../opstack-ui-review/SKILL.md). Confirm each finding from a concrete reachable scenario, with a small test or executable reproduction when possible. Do not run destructive or externally mutating tests just to validate a review.

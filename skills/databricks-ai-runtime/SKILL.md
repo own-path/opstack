@@ -1,0 +1,593 @@
+---
+name: databricks-ai-runtime
+description: "Databricks AI Runtime, the `databricks air` CLI commands for submitting and managing GPU training workloads on Databricks serverless compute. Use for: writing and submitting `databricks air` workload YAML, choosing an accelerator type and Python environment, reading Unity Catalog tables as training data with UCDataset, passing hyperparameters and secrets, configuring retries, checking run status, listing/cancelling runs, streaming a run's logs and watching its progress, debugging failed runs, GPU pools, multi-container workloads, custom Docker image setup, and converting a workload to a Databricks Asset Bundle."
+compatibility: Requires Databricks CLI 1.18.0 or newer for the air command. Flattened code_source, multi-container workloads, and workspace-validated dry runs require CLI 1.20.0 or newer; older CLIs can use the nested snapshot format documented below. Listing the accelerator types available in your workspace requires CLI 1.23.0 or newer. See the [AI Runtime CLI setup guide](https://docs.databricks.com/aws/en/machine-learning/ai-runtime/connecting/cli).
+metadata:
+  version: "0.3.1"
+---
+
+# Databricks AI Runtime (`databricks air`)
+
+Databricks AI Runtime is a set of `databricks air` CLI commands for submitting GPU training workloads to Databricks serverless compute. It manages environment setup, distributed training configuration, and workload lifecycle, without requiring you to manage clusters or infrastructure.
+
+This skill covers the three everyday flows: **starting a run**, **checking on a run**, and **monitoring a run** as it trains.
+
+## Reference discipline
+
+The CLI's built-in help is the source of truth for field names, accelerator
+types, defaults, and constraints. Prefer it at runtime over anything memorized.
+Look up a config field by passing its path to `-h` on the `run` command (the
+path is a separate argument):
+
+```bash
+databricks air run -h config                              # list the YAML fields
+databricks air run -h config.compute                      # one field
+databricks air run -h config.compute.accelerator_type     # a nested field
+```
+
+`databricks air <subcommand> --help` documents each command's flags. This skill
+covers workflow and the few things the help does not spell out.
+
+## Session setup
+
+Check the CLI version, confirm the command is available, and list your
+Databricks config profiles:
+
+```bash
+databricks version
+databricks air --help
+databricks auth profiles --skip-validate    # available Databricks config profiles
+```
+
+The examples use flattened `code_source` fields, available in
+[Databricks CLI 1.20.0 and newer](https://github.com/databricks/cli/releases/tag/v1.20.0).
+On an older CLI, use the equivalent nested snapshot format shown under
+[Workload YAML](#workload-yaml). CLI 1.20.0 and newer accept both formats.
+Do not mix nested and flattened fields in the same configuration.
+
+Pass `-p <profile>` on every command. Add `-o json` for scripted/programmatic
+calls so you get a structured envelope instead of human text:
+
+- **Success**: `{"v": 1, "ts": "...", "data": {...}}`
+- **Error**: `{"v": 1, "ts": "...", "error": {"code": "...", "kind": "...", "message": "...", "retryable": bool}}`
+
+Config validation (input) errors are the exception: they print as plain text to
+stderr with a non-zero exit even under `-o json`, so check the exit code and
+stderr too, not just the parsed JSON. When you do get a structured error, its
+`kind` tells you what to do:
+
+| kind | Meaning | Action |
+|---|---|---|
+| `PERMANENT` | Not authenticated / permission denied / feature disabled / non-retryable | If auth: `databricks auth login --host <workspace-url>` |
+| `NOT_FOUND` | Bad run ID / resource | Check the input |
+| `CONFLICT` | Idempotency key collision | Use a new `--idempotency-key` |
+| `TRANSIENT` | Retryable | Retry |
+
+## Subcommands
+
+| Command | What it does |
+|---|---|
+| `databricks air run` | Submit a workload from a YAML file. Add `--watch` to stream logs until it finishes, `--dry-run` to validate without submitting, and `--override <field>=<value>` (repeatable) to change a field without editing the YAML. |
+| `databricks air get <JOB_RUN_ID>` | Show status, config, timing, and the failure reason for one run. |
+| `databricks air list` | List your **active** runs. A run that just finished drops out of the default view; add `--all-status` to include finished runs. Also `--all-users`, `--filter KEY=VALUE`, `--limit`. |
+| `databricks air cancel <JOB_RUN_ID> [<JOB_RUN_ID>...]` / `... --all` | Cancel one or more runs, or all of your active runs (`--all` prompts; add `--yes` in scripts). |
+| `databricks air logs <JOB_RUN_ID>` | Print a run's logs. Newer CLIs print the logs available now and exit, and stream with `--follow`; older CLIs (no `--follow` in `--help`) stream an active run by default. |
+| `databricks air pools list` / `pools get <POOL_ID>` | View the provisioned GPU pools available to the workspace. |
+| `databricks air images push` | Push a local or remote container image to Databricks Artifact Registry. See [docker-images.md](docker-images.md). |
+| `databricks air convert-to-dabs <yaml_path>` | Convert a workload YAML into a Databricks Asset Bundle (local only; deploy with `databricks bundle deploy`). |
+
+For flags and defaults, run `databricks air <subcommand> --help`.
+
+## Workload YAML
+
+```yaml
+experiment_name: my-training-job     # alphanumeric, - and _ only
+compute:
+  num_accelerators: 1
+  accelerator_type: GPU_1xA10        # run `databricks air run -h config.compute` for valid values
+environment:
+  version: "6"                       # Standard environment; use databricks_ai_v6 for PyTorch preinstalled
+  dependencies:
+    - torch
+    - mlflow
+code_source:
+  root_path: "."                     # relative to workload.yaml; extracted to $CODE_SOURCE_PATH on each node
+max_retries: 0                       # while iterating; see Retries below
+command: |-
+  cd "$CODE_SOURCE_PATH"
+  python train.py
+```
+
+Submit with `databricks air run --file workload.yaml -p <profile>`. Field
+details live in `databricks air run -h config.<field>` (the authoritative
+source).
+
+For an older CLI, replace only the `code_source` block above with:
+
+```yaml
+code_source:
+  type: snapshot
+  snapshot:
+    root_path: "."
+```
+
+The values and behavior are the same: add `type: snapshot` under `code_source`
+and put all snapshot fields (`root_path`, and any `remote_volume`, `git`, or
+`include_paths`) inside `code_source.snapshot`. Keep the rest of the workload
+unchanged. Check `databricks air run -h config.code_source` for the fields
+supported by the installed CLI.
+
+### Accelerator types
+
+Run `databricks air run -h config.compute` to see the accelerator types. On CLI
+1.23.0 and newer it lists the types **available in the current workspace** and
+how many GPUs each type has per node. If it cannot fetch them, it prints a
+warning. Some older CLI versions also show a built-in fallback that may include
+types the workspace can't use. Do not guess a type from memory: availability
+depends on the workspace, cloud, and region, and matching is case-sensitive.
+
+Type names follow `GPU_<GPUs per node>x<GPU>`, for example `GPU_1xA10`,
+`GPU_1xH100`, `GPU_8xH100`, and `GPU_8xB300`. `num_accelerators` is the total
+GPU count across all nodes, so it must be a multiple of the per-node count: 8
+on an `8x` type is one node, 16 is two nodes. `GPU_1xH100` does not support
+multi-node configurations, so set `num_accelerators: 1`.
+
+### Python environment
+
+Pick the environment from what the training code imports, before you submit,
+so a missing package does not surface only after a GPU has been provisioned:
+
+| `environment` | What it provides | Use when |
+|---|---|---|
+| `version: "6"` (the default) | Standard environment: Python and CUDA only. Since version 5, it does **not** include `torch` or `torchvision`. | You control the dependency stack. List every import, including `torch`, under `dependencies`. |
+| `version: databricks_ai_v6` | Databricks AI environment: PyTorch, Transformers, and other ML frameworks preinstalled. | Typical PyTorch or Hugging Face training. Add extras under `dependencies`. |
+| `unity_catalog_image: <catalog>.<schema>.<image>:<tag>` | Your own Docker image. | System libraries or CUDA extensions; see [Custom Docker images](#custom-docker-images). |
+
+Before submitting, check the script's imports against the chosen environment.
+For the exact packages in each environment version, see the
+[environment version release notes](https://docs.databricks.com/aws/en/release-notes/serverless/environment-version/).
+Do not combine `unity_catalog_image` with `version` or `dependencies`.
+
+## Configuring the workload
+
+These optional top-level fields cover the common needs. Run
+`databricks air run -h config.<field>` for the full reference on any of them.
+
+### Hugging Face gated models
+
+When a model needs a Hugging Face (HF) token, lead with this checklist before
+asking for other training details or running secrets commands:
+
+1. Accept the model license on HF and, if required, wait for access approval.
+   Create a fine-grained read-only token with **Read access to contents of all
+   public gated repos you can access**. For a private repo, also grant read
+   access to that specific repo.
+2. Choose an existing scope the user owns and can write. If they need to find
+   one, have them filter `list-scopes` to their own username or scopes they
+   created, then confirm ownership and access; a name match alone is not proof.
+   For example, the user can run the following with their own username:
+   ```bash
+   databricks secrets list-scopes -p <profile> -o json | jq -r --arg user "<your-username>" '.[] | select(.name | contains($user)) | .name'
+   ```
+   Never browse or inspect other users' scopes or keys. Create a scope only if
+   needed; if `create-scope` reports `Max limit of 2000 scopes has been reached`,
+   reuse an existing user-owned scope instead. The user may need to run
+   `list-acls` on their own scope to check access. Before using `<scope>` in any
+   `databricks secrets ...` command, validate it: it must be an existing scope
+   the user owns, from their own scopes, and match the scope-name charset
+   `^[A-Za-z0-9_.@-]+$`. If it doesn't, have the user run the commands
+   themselves. Always double-quote it. If the scope is Azure Key Vault-backed
+   (`backend_type` is `AZURE_KEYVAULT`), `put-secret` can't write to it: have
+   the user add the token to that vault with their own tooling and use that
+   secret's name as the key below.
+3. First check whether `hf-token` already exists in the scope, using the
+   key-name check in step 4. If it does, reuse it only if it is the right
+   token; otherwise pick a new key such as `hf-token-gemma`, or get the user's
+   explicit OK before overwriting it, since other workloads may read it. Use
+   the chosen key in steps 4 and 5. Have the user run this in **their own
+   terminal** and enter the token at the hidden prompt. Never paste the token
+   into chat or a command line.
+   ```bash
+   databricks secrets put-secret "<scope>" hf-token -p <profile>
+   ```
+4. Once they have stored it and named their scope, verify only the key name in
+   that one scope, filtering the output to `hf-token`:
+   ```bash
+   databricks secrets list-secrets "<scope>" -p <profile> -o json | jq -r '.[] | select(.key == "hf-token") | .key'
+   ```
+5. Reference `secrets: {HF_TOKEN: "<scope>/hf-token"}` in the workload. Quote
+   the reference, particularly when the scope contains `@` or `.`. Transformers
+   reads `HF_TOKEN` automatically.
+
+Gemma 3 is gated; Mistral Small 3.2, gpt-oss-20b, and Qwen3 are ungated and do
+not need a token just to download their public weights. Check the specific
+model's HF page for current access requirements.
+
+### Training data in Unity Catalog
+
+When the training script reads rows from a Unity Catalog (UC) table, use
+`UCDataset` (Beta), a PyTorch dataset that reads the table's files directly.
+An AIR workload has no `spark` global, so code that calls `spark.table()` fails.
+Lead with this checklist before writing the script:
+
+1. Use `environment.version: databricks_ai_v6` and add
+   `databricks-uc-dataset==0.0.1b1` to `environment.dependencies`. If the
+   script also imports `databricks.air.data`, for example its `DataLoader`,
+   add `"databricks-sdk-air[data]"` as well, as the AIR docs ask of CLI
+   workloads; some `databricks_ai_v6` builds don't include it. With
+   `unity_catalog_image`, which can't be combined with `version` or
+   `dependencies`, install these packages in the image instead.
+2. Launch with `torchrun`, even on one GPU, for example
+   `torchrun --nproc_per_node=$LOCAL_WORLD_SIZE train.py`. AIR sets
+   `WORLD_SIZE` but not `RANK`, and `UCDataset` raises when only one of them is
+   set. With DDP, call `torch.distributed.init_process_group()` before you
+   create the dataset, and create it on every rank.
+3. The workload reads the table as the identity that submits it, which needs
+   `USE CATALOG`, `USE SCHEMA`, and `SELECT`. `UCDataset` reads only Delta
+   tables in UC. It can't read views, materialized views, streaming tables,
+   shallow clones, tables with a `VARIANT` column, or tables with row filters
+   or column masks; see the
+   [limitations](https://docs.databricks.com/aws/en/machine-learning/ai-runtime/develop-workloads/load-uc-tables#limitations).
+4. Before submitting, check each table, so a wrong name, a missing privilege, or
+   an unsupported table fails in seconds instead of after the GPUs start. Keep
+   the arguments in single quotes so the shell doesn't expand them:
+   ```bash
+   databricks tables get '<catalog>.<schema>.<table>' -o json -p <profile>
+   databricks experimental aitools tools query 'SELECT COUNT(*) FROM IDENTIFIER(:t)' --param 't=<catalog>.<schema>.<table>' -p <profile>
+   ```
+   Continue only if `table_type` is `MANAGED` or `EXTERNAL`,
+   `data_source_format` is `DELTA`, there's no `row_filter`, no column has a
+   `mask` or a `VARIANT` type, and the count returns. Backtick-quote name parts
+   that contain characters other than letters, digits, and underscores; if a
+   name contains `'`, have the user run the checks. The query needs a SQL
+   warehouse (add `--warehouse <id>` to choose one), and `experimental`
+   commands can change between CLI versions. If the query can't run for a
+   reason unrelated to the table, report the check as inconclusive, not as a
+   missing privilege.
+
+If creating the dataset fails with `PERMISSION_DENIED: ... prohibited from
+retrieving temporary storage credentials from Unity Catalog in network
+restricted workspaces`, the workspace's serverless network policy blocks
+`UCDataset`. The checks in step 4 still pass in that case, and tables in the
+`samples` catalog may still load. Retrying, or changing how the script calls
+`UCDataset`, won't help: tell the user, since an account admin controls that
+policy. If the user says the policy changed and the same error comes back,
+resubmit at most once with `max_retries: 0`, then stop.
+
+For files in a UC volume, such as images or audio, use
+`databricks.air.data.UCVolumeDataset` instead. For a complete workload, see
+[Load UC tables into PyTorch with UCDataset](https://docs.databricks.com/aws/en/machine-learning/ai-runtime/develop-workloads/load-uc-tables)
+and the cookbook's
+[click-through-rate recipe](https://github.com/databricks-solutions/ai-runtime-cookbook/tree/main/recommendation-and-ranking/click-through-rate-uc-dataset).
+
+### Environment variables and secrets
+
+Set plain values under `env_variables`; pull sensitive values from Databricks
+Secrets under `secrets` (each entry maps an env var name to a `scope/key`, and
+the value is materialized on the worker, never logged):
+
+```yaml
+env_variables:
+  BATCH_SIZE: "32"
+secrets:
+  HF_TOKEN: "<scope>/hf-token"          # -> $HF_TOKEN on every node
+  WANDB_API_KEY: "<scope>/wandb_key"
+```
+
+The scope and keys must already exist. Prefer a user-owned scope; create one
+only if needed, and have the user store secret values in their own terminal.
+Secret env var names must not collide with `env_variables` names.
+
+### Parameters (hyperparameters)
+
+`parameters` is the clean way to pass hyperparameters into your script and
+change them between runs without editing training code. The CLI writes them to
+a YAML file on the cluster and exposes its path as `$HYPERPARAMETERS_PATH`:
+
+```yaml
+parameters:
+  learning_rate: 2e-5
+  batch_size: 32
+  warmup_steps: 1000
+  use_amp: true
+```
+
+Read them in the script, converting every number to the type your code
+expects:
+
+```python
+import os, yaml
+with open(os.environ["HYPERPARAMETERS_PATH"]) as f:
+    hp = yaml.safe_load(f)
+lr = float(hp["learning_rate"])
+batch_size = int(hp["batch_size"])
+warmup_steps = int(hp["warmup_steps"])
+use_amp = hp["use_amp"]
+```
+
+Always convert numeric values with `float()` or `int()`, including values in
+nested dicts and lists: `yaml.safe_load` can return floats such as `2e-5`,
+`0.00002`, or `1e6` as strings. Write integers as plain digits (`1000000`,
+not `1e6`), because `int("1e+06")` fails.
+
+Strings, booleans, lists, and nested dicts arrive with their types. Quote a
+value that must stay a string but looks like a number (`run_tag: "1e5"`,
+`version: "1.10"`); unquoted, it is read as a number. To sweep a
+hyperparameter without editing the YAML, resubmit with
+`--override parameters.learning_rate=0.0005` (and a fresh idempotency key).
+
+### Retries
+
+Failed attempts are retried automatically: `max_retries` defaults to 3 when
+unset (confirm with `databricks air run -h config.max_retries`). Each retry
+provisions GPUs and reruns the whole command, so a deterministic failure (an
+import error, a typo, a bad path) fails 4 times before the run gives up.
+
+**Set `max_retries: 0` while writing, debugging, or iterating on a workload**,
+either in the YAML or with `--override max_retries=0`. Raise it only for a
+long, stable training run where retrying can recover from transient
+infrastructure failures, and make the training code resume from a checkpoint
+so a retry does not start over. When `timeout_minutes` is set, it applies
+per attempt.
+
+### Permissions
+
+By default only you can see the run. Grant others access to the submitted job
+with `permissions` (DABs-compatible format); levels are `CAN_VIEW`,
+`CAN_MANAGE_RUN`, `CAN_MANAGE`:
+
+```yaml
+permissions:
+  - group_name: data-engineering
+    level: CAN_VIEW
+  - user_name: alice@example.com
+    level: CAN_MANAGE
+```
+
+### Other fields
+
+| Field | Use |
+|---|---|
+| `timeout_minutes` | Wall-clock limit per attempt, in minutes. |
+| `idempotency_token` | YAML equivalent of `--idempotency-key`: resubmitting with the same token returns the existing run. |
+| `mlflow_run_name`, `mlflow_experiment_directory` | Name the MLflow run, or choose the workspace directory that holds the experiment. |
+| `compute.pool_id`, `compute.priority_class` | Run on a pre-provisioned GPU pool (find IDs with `databricks air pools list`). `priority_class` is `NORMAL` or `BEST_EFFORT` (preemptable) and requires `pool_id`. |
+| `containers` | Run different images and commands on different node ranks, for example a trainer and an inference server. Replaces `command`; each entry needs `name`, `command`, `ranks`, and `unity_catalog_image`. See `databricks air run -h config.containers`. |
+
+## Environment variables provided on each node
+
+`databricks air` sets these automatically on every node; use them in `command:`
+and in your training code.
+
+| Variable | Meaning |
+|---|---|
+| `CODE_SOURCE_PATH` | Absolute path to your extracted `code_source` on the node (`cd $CODE_SOURCE_PATH`). |
+| `MASTER_ADDR` / `MASTER_PORT` | Address/port of the rank-0 node for distributed coordination. |
+| `NUM_NODES` | Total number of nodes. |
+| `NODE_RANK` | Rank of the current node (0 to `NUM_NODES`-1). Also set as `POD_RANK`. |
+| `WORLD_SIZE` | Total number of GPUs across all nodes. |
+| `LOCAL_WORLD_SIZE` | Number of GPUs on this node. |
+| `MLFLOW_RUN_ID` | MLflow run created for this attempt (log metrics/artifacts to it). `mlflow.start_run()` attaches to it. The Hugging Face `Trainer`'s MLflow integration starts it automatically, so don't also call `mlflow.start_run()` around `trainer.train()`: it fails with "Run ... is already active". |
+| `HYPERPARAMETERS_PATH` | Path to the `parameters` YAML file (only set when `parameters:` is defined). |
+
+Your `command:` runs **once per node**, so per-process ranks (`RANK`,
+`LOCAL_RANK`) are **not** set by the platform. Your distributed launcher
+(torchrun, accelerate) assigns them when it spawns one process per GPU; pass it
+`$NODE_RANK` / `$NUM_NODES` / `$MASTER_ADDR` / `$MASTER_PORT`.
+
+## Starting a run
+
+**Start from a cookbook recipe when one fits.** The
+[AI Runtime Cookbook](https://github.com/databricks-solutions/ai-runtime-cookbook)
+has runnable recipes, each a `workload.yaml` plus source code, grouped by domain
+(`language-models/`, `computer-vision/`, `recommendation-and-ranking/`,
+`time-series/`, `multimodal/`, `serving/`, and more; Ray recipes live in these
+domain folders with a `ray-` prefix). `getting-started/air-cli/` is the
+minimal first run. Adapting the closest recipe is usually faster and less
+error-prone than writing a workload from scratch:
+
+```bash
+git clone https://github.com/databricks-solutions/ai-runtime-cookbook.git
+cd ai-runtime-cookbook/<domain>/<recipe>     # e.g. getting-started/air-cli
+# Review workload.yaml (and the recipe README) for values to configure, then:
+databricks air run --file workload.yaml --dry-run -o json -p <profile>
+databricks air run --file workload.yaml --watch \
+  --idempotency-key <key> -o json -p <profile>  # key as in step 5
+```
+
+Apply the steps below to the recipe's YAML the same way as to a new one,
+including the stable `--idempotency-key` from step 5.
+
+1. **Turn the user's intent into the YAML.** Extract model, dataset path, GPU
+   count and type, and the training command from the request. For gated models,
+   lead with the [token checklist](#hugging-face-gated-models) first. For data
+   in a UC table, follow the [UC data checklist](#training-data-in-unity-catalog).
+   Ask before synthesizing a config when a remaining critical detail is
+   ambiguous (data path, checkpoint dir, custom image).
+
+2. **Write the `command:`** using the env vars above. Common launch shapes:
+
+   | Framework | `command:` shape |
+   |---|---|
+   | plain torch, single GPU | `python train.py` (with `UCDataset`, use `torchrun`; see the [UC data checklist](#training-data-in-unity-catalog)) |
+   | torch, multi-GPU (1 node) | `torchrun --nproc_per_node=$LOCAL_WORLD_SIZE train.py` |
+   | torch, multi-node | `torchrun --nnodes=$NUM_NODES --nproc_per_node=$LOCAL_WORLD_SIZE --node_rank=$NODE_RANK --master_addr=$MASTER_ADDR --master_port=$MASTER_PORT train.py` |
+   | HuggingFace Accelerate | `accelerate launch --config_file accelerate.yaml train.py` |
+   | DeepSpeed | `deepspeed --num_gpus=$LOCAL_WORLD_SIZE train.py` |
+   | Composer / MosaicML | `composer train.py` |
+
+   Multi-line commands go under `command: |-`. Access uploaded code via
+   `$CODE_SOURCE_PATH`. **Total GPUs = nodes x accelerators-per-node**; see
+   [Accelerator types](#accelerator-types).
+
+3. **Pre-flight the referenced resources** so the job does not die on startup:
+   - Every package the script imports is in the chosen
+     [environment](#python-environment) or its `dependencies` (the Standard
+     environment has no `torch`).
+   - `max_retries: 0` is set while the workload is new or being debugged.
+   - For each `secrets` reference, verify only its key name in the user's chosen
+     scope, filtering `list-secrets` as in the [token checklist](#hugging-face-gated-models).
+     Never browse other users' scopes or list their keys.
+   - Every UC table the script reads passes both checks in the
+     [UC data checklist](#training-data-in-unity-catalog). A dry run doesn't
+     check UC tables, however the script gets their names.
+   - If `environment.unity_catalog_image` is set, the image has been pushed to
+     Databricks Artifact Registry in the same workspace and the submitting
+     identity can read it (see [docker-images.md](docker-images.md)).
+
+4. **Dry-run before submitting.** This validates the config without launching:
+   ```bash
+   databricks air run --file workload.yaml --dry-run -o json -p <profile>
+   ```
+   On CLI 1.20.0 and newer, the dry run also checks the config against the
+   workspace, so it needs a working profile. A config-validation error is a
+   hard stop: it prints as plain text on stderr with a non-zero exit, so show
+   that message to the user and fix the YAML. Other failures are infra/auth
+   and should bubble up.
+
+5. **Submit.** Use a stable `--idempotency-key` so an accidental re-run does not
+   double-submit (compose it from `<user>-<experiment>-<YYYYMMDD>-v<N>` and bump
+   `vN` on each resubmit; avoid dynamic subexpressions like `$(uuidgen)` so the
+   command stays auto-approvable). If you want to wait for the run to finish or
+   stream live progress, add `--watch`:
+   ```bash
+   databricks air run --file workload.yaml --watch \
+     --idempotency-key <key> -o json -p <profile>
+   ```
+   `--watch` streams logs and status updates until the run finishes and exits 0
+   only if the run succeeds. With `-o json`, it emits JSONL and includes the run
+   ID. For long runs, use the agent's background-execution support. Stopping
+   `--watch` does not cancel the run, so if it exits non-zero after returning a
+   run ID, check `air get` before resubmitting. If the user only wants to submit
+   the run, omit `--watch` and return the run ID.
+
+## Checking on a run
+
+```bash
+databricks air get <JOB_RUN_ID> -o json -p <profile>        # status, config, timing, failure reason
+databricks air list -o json -p <profile>                    # your active runs
+databricks air list --all-status -o json -p <profile>       # include finished runs
+databricks air logs <JOB_RUN_ID> -p <profile>               # view logs for an existing run
+```
+
+Read the status from `.data.status` in the `air get -o json` envelope. The
+terminal statuses are `SUCCESS`, `FAILED`, `TIMEDOUT`, `CANCELED`,
+`INTERNAL_ERROR`, and `SKIPPED`. An empty `air list` means you have no
+**active** runs, not that the run is gone; use `--all-status` or `air get` to
+see a finished run.
+
+If no waiter is active and you need periodic status snapshots, read
+`.data.status`, sleep between calls, set a hard time limit, and stop on any
+terminal status or command error. Because `air run --watch` waits for the run
+to finish, you do not need to poll while it is active.
+
+## Monitoring a run
+
+**Wait and stream logs.** If you want to wait for a new run and receive live
+updates, use `--watch`:
+
+```bash
+databricks air run --file workload.yaml --watch -p <profile>
+```
+
+For a run that is already going, check whether `databricks air logs` supports
+`--follow`:
+
+```bash
+databricks air logs --help 2>&1 | grep -qF -- '--follow'
+```
+
+If that command succeeds, `air logs` prints the logs available now and exits,
+which is the right way to check progress, and `--follow` streams:
+
+```bash
+databricks air logs <JOB_RUN_ID> --tail 100 -p <profile>   # print the last 100 lines and exit
+databricks air logs <JOB_RUN_ID> --follow -p <profile>     # stream until the run finishes
+# --node N (one node), --tail N (last N lines), --minutes N (last N minutes),
+# --retry N (one retry attempt, 0-indexed), --download-to DIR (save all nodes' logs)
+```
+
+If the check fails, the CLI is older: `air logs <JOB_RUN_ID>` streams an active
+run until it finishes, and `--follow` is rejected. To check progress without
+blocking on an older CLI, use `databricks air get <JOB_RUN_ID>`.
+
+**Loss, GPU utilization, and metric history live in MLflow.** The CLI streams
+logs and status, not training metrics. The submit/status response includes the
+MLflow experiment and run URL; echo it so the user can open the run in the
+Databricks UI for loss curves, GPU utilization, and system charts.
+
+## If a run fails
+
+Get the failure reason, then pull the logs and surface the actual error to the
+user:
+
+```bash
+databricks air get <JOB_RUN_ID> -o json -p <profile>             # termination_reason
+databricks air logs <JOB_RUN_ID> --tail 500 -p <profile>         # latest attempt
+databricks air logs <JOB_RUN_ID> --retry 0 --tail 500 -p <profile>   # first attempt
+```
+
+If the run was retried, the latest attempt's logs may show a different symptom
+than the first failure; check `--retry 0`. On a multi-node run, check other
+nodes with `--node N` when node 0 looks healthy.
+
+`torchrun` workloads can print hundreds of `NCCL INFO` lines before the user's
+error, so search the logs for `Traceback` or `Error` rather than reading them in
+order. When creating a `UCDataset` fails, the traceback ends with the UC error,
+such as `TABLE_DOES_NOT_EXIST` or `PERMISSION_DENIED`. Under DDP it's a single
+long `rank 0 failed to build the Delta plan` line. In `databricks-uc-dataset`
+0.0.1b1, `UC returned no storage location` usually means the name is a view,
+and `set both RANK and WORLD_SIZE or neither` means the script wasn't launched
+with `torchrun`. See the [UC data checklist](#training-data-in-unity-catalog).
+A `TypeError` comparing `'float'` and `'str'` at optimizer or scheduler setup
+means a hyperparameter was read without `float()`; see
+[Parameters](#parameters-hyperparameters).
+
+Show the failing traceback and let the user decide the fix. Before
+resubmitting, set `max_retries: 0` so a deterministic error fails once.
+
+## Serving a trained model
+
+A model trained with `databricks air` is served as a
+[custom model](https://docs.databricks.com/aws/en/machine-learning/model-serving/custom-models):
+log it with MLflow, register it in Unity Catalog, and create a serving endpoint
+on CPU or GPU compute.
+
+To serve it with the library versions you tested, without pinning `torch` or
+CUDA for the serving container, use an
+[express deployment](https://docs.databricks.com/aws/en/machine-learning/model-serving/express-deployments)
+(Public Preview). The endpoint then runs the environment of the notebook you
+registered from. Express deployments require:
+
+- Logging and registering from an AI Runtime notebook to serve on GPU, or from
+  a serverless notebook to serve on CPU, with `mlflow>=3.12` and
+  `databricks-sdk>=0.102.0`.
+- Registering with
+  `mlflow.register_model(..., env_pack="databricks_model_serving")`. Do not use
+  `registered_model_name=` on `log_model`: it does not accept `env_pack` and
+  registers a standard model.
+- An environment of at most 200 GB.
+
+For LLMs, use
+[Custom LLM Serving](https://docs.databricks.com/aws/en/machine-learning/model-serving/serve-custom-llms),
+which builds on express deployments and starts an OpenAI-compatible server such
+as vLLM from the model's `entrypoint` metadata.
+
+GPU `workload_type` names map to different GPUs per cloud. For example,
+`GPU_LARGE` is an L40S (48 GB) on AWS and an A100 (80 GB) on Azure. See the GPU
+table on the Custom LLM Serving page.
+
+## Custom Docker images
+
+Use a custom Docker image instead of `environment.version` when your workload
+needs specific system libraries, CUDA extensions (flash-attn, apex, custom
+kernels), or dependencies that do not fit `environment.dependencies`.
+
+**Read [docker-images.md](docker-images.md)** for step-by-step guidance on:
+
+- Using Databricks-provided base images, including CUDA 13 images for B300
+- Dockerfile patterns
+- Pre-build compatibility checklist (CUDA/driver, PyTorch, NCCL, EFA/RDMA)
+- Pushing images with `databricks air images push` and running them with
+  `environment.unity_catalog_image`
+- Troubleshooting runtime errors such as `ssl.SSLError` on FIPS hosts

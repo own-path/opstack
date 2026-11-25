@@ -36,11 +36,11 @@ class InstallTests(unittest.TestCase):
         for agent in installer.TARGETS:
             self.target = self.base / agent
             self.assertEqual(self.run_install('--agent', agent), 0)
-            self.assertEqual(len(list(self.target.glob('*/SKILL.md'))), 13)
+            self.assertEqual(len(list(self.target.glob('*/SKILL.md'))), 159)
             before = installer.file_map(self.target)
             self.assertEqual(self.run_install('--agent', agent), 0)
             self.assertEqual(installer.file_map(self.target), before)
-            for skill in self.target.glob('*/SKILL.md'):
+            for skill in self.target.glob('opstack-*/SKILL.md'):
                 for link in re.findall(r'\]\(([^)#]+)(?:#[^)]*)?\)', skill.read_text()):
                     self.assertTrue((skill.parent / link).is_file(), link)
 
@@ -65,41 +65,20 @@ class InstallTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'outside this repository'):
             installer.main(['--target', str(ROOT / 'bad'), '--dry-run'])
 
-    def fixture_library(self):
-        library = self.base / 'library'
-        rows, hashes = [], []
-        for variant, name, path in [(False, 'Presentations', 'docs/presentations'), (False, 'pdf', 'docs/pdf'), (True, 'pdf', 'variants/claude/pdf')]:
-            skill = library / path
-            skill.mkdir(parents=True)
-            (skill / 'SKILL.md').write_text('---\nname: ' + name + '\ndescription: test\n---\n' + path)
-            rows.append({'name': name, 'path': path, 'variant': variant})
-            hashes.append({'path': path + '/SKILL.md', 'sha256': installer.digest(skill / 'SKILL.md')})
-        (library / 'manifest.json').write_text(json.dumps({'skills': rows}))
-        (library / 'checksums.json').write_text(json.dumps(hashes))
-        return library
+    def test_default_install_contains_the_actual_146_domain_skills(self):
+        self.assertEqual(self.run_install('--require-library'), 0)
+        self.assertEqual(self.run_install('--check-library'), 0)
+        self.assertTrue((self.target / 'break-ui/SKILL.md').is_file())
+        self.assertTrue((self.target / 'databricks-core/SKILL.md').is_file())
+        self.assertTrue((self.target / 'opstack-mode/references/domain-routing.md').is_file())
+        source = ROOT / 'skills/break-ui/SKILL.md'
+        self.assertEqual((self.target / 'break-ui/SKILL.md').read_bytes(), source.read_bytes())
 
-    def test_library_import_normalizes_copilot_and_selects_claude(self):
-        library = self.fixture_library()
-        self.assertEqual(self.run_install('--library', str(library)), 0)
-        self.assertEqual(len(list(self.target.glob('*/SKILL.md'))), 15)
-        self.assertIn('name: presentations\n', (self.target / 'presentations/SKILL.md').read_text())
-        self.target = self.base / 'claude'
-        self.assertEqual(self.run_install('--agent', 'claude', '--library', str(library)), 0)
-        self.assertIn('variants/claude/pdf', (self.target / 'pdf/SKILL.md').read_text())
-
-    def test_tampered_library_refuses_before_writes(self):
-        library = self.fixture_library()
-        (library / 'docs/pdf/SKILL.md').write_text('modified')
-        with self.assertRaisesRegex(ValueError, 'integrity check failed'):
-            self.run_install('--library', str(library))
-        self.assertFalse(self.target.exists())
-
-    def test_library_path_traversal_refused(self):
-        library = self.fixture_library()
-        (library / 'checksums.json').write_text(json.dumps([{'path': '../outside', 'sha256': 'bad'}]))
-        with self.assertRaisesRegex(ValueError, 'Invalid relative path'):
-            self.run_install('--library', str(library))
-        self.assertFalse(self.target.exists())
+    def test_claude_uses_bundled_alternate_versions(self):
+        self.assertEqual(self.run_install('--agent', 'claude'), 0)
+        for name in ['pdf', 'skill-creator']:
+            self.assertEqual((self.target / name / 'SKILL.md').read_bytes(),
+                             (ROOT / 'variants/claude' / name / 'SKILL.md').read_bytes())
 
     def test_core_integrity_rejects_tampering(self):
         copy = self.base / 'collection'
@@ -144,8 +123,8 @@ class InstallTests(unittest.TestCase):
         self.assertFalse(self.target.exists())
 
     def test_missing_full_library_refuses_before_writes(self):
-        with self.assertRaisesRegex(ValueError, 'Full-stack setup needs'):
-            self.run_install('--require-library')
+        with self.assertRaisesRegex(ValueError, 'Selected setup omits'):
+            self.run_install('--only', 'opstack-swarm', '--require-library')
         self.assertFalse(self.target.exists())
         self.assertEqual(self.run_install('--check-library'), 1)
         self.assertFalse(self.target.exists())
@@ -179,13 +158,27 @@ class InstallTests(unittest.TestCase):
         entry.symlink_to(outside)
         self.assertFalse(installer.domain_skill_available(self.target, 'break-ui'))
 
+    def test_workflow_foundations_reference_bundled_selected_skills(self):
+        catalog = json.loads((ROOT / 'skills/opstack-swarm/references/library-catalog.json').read_text())
+        selected = {row['installed_name'] for row in catalog['skills']}
+        mapping = json.loads((ROOT / 'library/workflow-foundations.json').read_text())
+        self.assertEqual(len(mapping['workflows']), 13)
+        for row in mapping['workflows']:
+            self.assertTrue((ROOT / 'skills' / row['workflow'] / 'SKILL.md').is_file())
+            self.assertTrue(row['based_on'])
+            for name in row['based_on']:
+                self.assertIn(name, selected)
+                self.assertTrue((ROOT / 'skills' / name / 'SKILL.md').is_file())
+        self.assertEqual(len(selected), 146)
+        self.assertEqual(len(list((ROOT / 'skills').glob('*/SKILL.md'))), 159)
+
     def test_manifests_and_names(self):
         for client in ['cursor', 'claude', 'codex']:
             data = json.loads((ROOT / ('.' + client + '-plugin') / 'plugin.json').read_text())
             self.assertEqual(data['name'], 'opstack')
             self.assertTrue((ROOT / data['skills']).is_dir())
         for skill in (ROOT / 'skills').glob('*/SKILL.md'):
-            self.assertRegex(skill.read_text(), r'(?m)^name: ' + skill.parent.name + r'$')
+            self.assertTrue(installer.domain_skill_available(ROOT / 'skills', skill.parent.name), skill.parent.name)
 
 
 if __name__ == '__main__':

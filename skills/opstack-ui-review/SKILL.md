@@ -5,6 +5,13 @@ description: "Build or review UI using real content and interaction evidence: re
 
 # Check the interface people use
 
+## Foundation in the selected skills
+
+[emil-design-eng](../emil-design-eng/SKILL.md), [break-ui](../break-ui/SKILL.md), [mobile-native](../mobile-native/SKILL.md), [gestures](../gestures/SKILL.md), [review-animations](../review-animations/SKILL.md), [animation-performance](../animation-performance/SKILL.md), [pick-ui-library](../pick-ui-library/SKILL.md)
+
+Use these actual design, worst-case content, mobile, gesture, motion, and library-selection skills as the UI review method. Read the matching SKILL.md and required references, then use the checklist below to coordinate and verify the result. Read only the sources applicable to the current task and preserve their scope and requirements.
+
+
 Start from the user's task, existing design system, and the actual target screens. Prefer an existing component over inventing another primitive. Use semantic controls with accessible names, keyboard operation, visible focus, and appropriate focus restoration. Inspect hierarchy, spacing, type, contrast, content density, and error recovery against the project's established visual language.
 
 Exercise empty, loading, error, success, disabled, and long-content states where relevant. Check narrow screens, zoom, overflow, slow network responses, and repeated actions. For mobile inspect safe areas, touch targets, keyboard behavior, and scroll interactions. Use real or representative awkward data rather than only ideal samples.
